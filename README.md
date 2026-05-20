@@ -51,20 +51,20 @@ Disease chromatin remodelling is consistent with the SIPHON model (Patrick et al
                                 └────────────┬────────────┘  against the universal peak set
                                              ▼
                                 ┌─────────────────────────┐
-                                │ 07_DAR                  │  Pseudo-bulk DESeq2 (DATesting.R)
+                                │ 06_DAR                  │  Pseudo-bulk DESeq2 (DATesting.R)
                                 └────────────┬────────────┘  per cell type per tissue
                                              ▼
                                 ┌─────────────────────────┐
-                                │ 08_HOMER                │  Motif enrichment (NS + Stable bg)
+                                │ 07_HOMER                │  Motif enrichment (NS + Stable bg)
                                 └────────────┬────────────┘  4 backgrounds × 2 directions
                                              ▼
                                 ┌─────────────────────────┐
-                                │ 09_aging_comparison     │  bedtools intersect vs Lu 2026
+                                │ 08_aging_comparison     │  bedtools intersect vs Lu 2026
                                 │ (Aim 3)                 │  Fisher OR + Pearson r
                                 └────────────┬────────────┘
                                              ▼
                                 ┌─────────────────────────┐
-                                │ 10_figures              │  All 21 thesis figures
+                                │ 09_figures              │  All 21 thesis figures
                                 └─────────────────────────┘
 ```
 
@@ -107,7 +107,7 @@ bash   00_download/download_science_aging.sh             # manual
 # Kidney + Aorta — Cell Ranger ATAC (template at 00_download/cellranger_template.md)
 # Lung — dnbc4tools (run scripts at 01_preprocessing/lung/dnbc4tools_per_sample/)
 
-# 6. Run pipeline stages 01-10 in order (each subdir's README has commands)
+# 6. Run pipeline stages 01-09 in order (each subdir's README has commands)
 ```
 
 ---
@@ -138,15 +138,14 @@ bash   00_download/download_science_aging.sh             # manual
 04_universal_peaks/      — Cross-tissue universal peak set (merge_universal_mm10.py)
 05_universal_assays/     — Re-quantify each tissue's Seurat obj against universal peaks
                             (Lung gets an extra prune step via Diagnose_lung.R)
-07_DAR/                  — Pseudo-bulk DESeq2 — one script per tissue, all using their own obj
-08_HOMER/                — Motif enrichment (NS + Stable backgrounds)
-09_aging_comparison/     — Aim 3 — bedtools intersect against Lu 2026 + Fisher + Pearson r
-10_figures/              — All 21 thesis figures + supplementary
+06_DAR/                  — Pseudo-bulk DESeq2 — one script per tissue, all using their own obj
+07_HOMER/                — Motif enrichment (NS + Stable backgrounds)
+08_aging_comparison/     — Aim 3 — bedtools intersect against Lu 2026 + Fisher + Pearson r
+09_figures/              — All 21 thesis figures + supplementary
 environment/             — R + Python + HPC module specs
-thesis_reference/        — Thesis markdown + figure structure outline
 ```
 
-Note: there is no `06_integration/` stage. The 4-tissue Harmony integration step was used only to make the UMAP-side visualisation (Aim 1 Fig 2) and a global cell-type re-annotation pass — it is not part of the canonical DAR pipeline. The script that produced the integrated UMAP for figures lives at `10_figures/Fig7_UMAP/Fig_integration_UMAP.R`.
+Note: the 4-tissue Harmony integration step (used only to make the integrated UMAP figure for Aim 1) is not part of the canonical DAR pipeline. The script that produced the integrated UMAP lives under `09_figures/Fig7_UMAP/Fig_integration_UMAP.R`.
 
 ---
 

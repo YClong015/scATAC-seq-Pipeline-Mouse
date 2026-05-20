@@ -42,10 +42,10 @@ Each tissue's `SeuratObject.R` contains a tissue-specific `clean_barcodes()` / `
 
 | Tissue | Output | Notes |
 |---|---|---|
-| Kidney | `${DATA_ROOT}/Kidney/kidney_merged_universal.rds` | Read by `07_DAR/Kidney_pseudo-bulk_DAR.R` |
-| Lung | `${DATA_ROOT}/Lung/lung_universal_new_pruned.rds` | Pruned to match Kidney's 667,459 feature count via `Diagnose_lung.R`. Read by `07_DAR/Lung_specific_DAR_pseudo-bulk.R` |
-| Aorta | `${DATA_ROOT}/Aorta/Aorta_integrated_universal.rds` | Read by `07_DAR/Aorta_pseudo-bulk_DAR.R` |
-| T cells | `${DATA_ROOT}/Tcells/tcells_universal.rds` | Read by `07_DAR/Tcells_pseudo-bulk_DAR.R` |
+| Kidney | `${DATA_ROOT}/Kidney/kidney_merged_universal.rds` | Read by `06_DAR/Kidney_pseudo-bulk_DAR.R` |
+| Lung | `${DATA_ROOT}/Lung/lung_universal_new_pruned.rds` | Pruned to match Kidney's 667,459 feature count via `Diagnose_lung.R`. Read by `06_DAR/Lung_specific_DAR_pseudo-bulk.R` |
+| Aorta | `${DATA_ROOT}/Aorta/Aorta_integrated_universal.rds` | Read by `06_DAR/Aorta_pseudo-bulk_DAR.R` |
+| T cells | `${DATA_ROOT}/Tcells/tcells_universal.rds` | Read by `06_DAR/Tcells_pseudo-bulk_DAR.R` |
 
 All four objects share the same `peaks_universal` assay with the same peak coordinates (after Lung pruning), enabling cross-tissue comparison.
 
@@ -53,4 +53,4 @@ All four objects share the same `peaks_universal` assay with the same peak coord
 
 When `SeuratObject.R` re-quantifies Lung against the universal peak set, it occasionally produces +14 extra peak features beyond the Kidney/Aorta/Tcells count (667,473 vs 667,459). The reason is an artefact of the chromosome-set difference between the tissues' source fragment files. `Diagnose_lung.R` prunes Lung's feature space to exactly match Kidney's reference so that all four objects can be merged or compared peak-by-peak in downstream stages.
 
-The output `lung_universal_new_pruned.rds` is what `07_DAR/Lung_specific_DAR_pseudo-bulk.R` reads.
+The output `lung_universal_new_pruned.rds` is what `06_DAR/Lung_specific_DAR_pseudo-bulk.R` reads.

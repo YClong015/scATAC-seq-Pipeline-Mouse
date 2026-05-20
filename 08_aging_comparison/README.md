@@ -15,29 +15,29 @@ The 5mo-vs-21mo variant also adds a `sex` covariate when both sexes are balanced
 
 ```bash
 # 0. Inspect Lu 2026 h5ad structure (cell types, ages, samples)
-sbatch 09_aging_comparison/01_explore_h5ad.sh
+sbatch 08_aging_comparison/01_explore_h5ad.sh
 
 # 1. Re-call aging DARs (one job per tissue × variant)
-sbatch 09_aging_comparison/02_aging_DAR/02_pseudobulk_DESeq2.sh        # original combined (kidney+lung)
+sbatch 08_aging_comparison/02_aging_DAR/02_pseudobulk_DESeq2.sh        # original combined (kidney+lung)
 # OR finer-grained variants:
-sbatch 09_aging_comparison/02_aging_DAR/02a_pseudobulk_Kidney.sh
-sbatch 09_aging_comparison/02_aging_DAR/02a_pseudobulk_Kidney_5movs21mo.sh
-sbatch 09_aging_comparison/02_aging_DAR/02b_pseudobulk_Lung.sh
-sbatch 09_aging_comparison/02_aging_DAR/02b_pseudobulk_Lung_5movs21mo.sh
+sbatch 08_aging_comparison/02_aging_DAR/02a_pseudobulk_Kidney.sh
+sbatch 08_aging_comparison/02_aging_DAR/02a_pseudobulk_Kidney_5movs21mo.sh
+sbatch 08_aging_comparison/02_aging_DAR/02b_pseudobulk_Lung.sh
+sbatch 08_aging_comparison/02_aging_DAR/02b_pseudobulk_Lung_5movs21mo.sh
 
 # 2. Disease-vs-aging overlap (one variant per script)
-sbatch 09_aging_comparison/03_overlap/03_overlap_and_plots.sh                       # combined kidney+lung
-sbatch 09_aging_comparison/03_overlap/03a_overlap_Kidney_oldobj.sh                  # Kidney isolated
-sbatch 09_aging_comparison/03_overlap/03a_overlap_Kidney_oldobj_5movs21mo.sh        # Kidney pure-aging
-sbatch 09_aging_comparison/03_overlap/03b_overlap_and_plots_Lung.sh                 # Lung isolated
-sbatch 09_aging_comparison/03_overlap/03b_overlap_and_plots_Lung_5movs21mo.sh       # Lung pure-aging
+sbatch 08_aging_comparison/03_overlap/03_overlap_and_plots.sh                       # combined kidney+lung
+sbatch 08_aging_comparison/03_overlap/03a_overlap_Kidney_oldobj.sh                  # Kidney isolated
+sbatch 08_aging_comparison/03_overlap/03a_overlap_Kidney_oldobj_5movs21mo.sh        # Kidney pure-aging
+sbatch 08_aging_comparison/03_overlap/03b_overlap_and_plots_Lung.sh                 # Lung isolated
+sbatch 08_aging_comparison/03_overlap/03b_overlap_and_plots_Lung_5movs21mo.sh       # Lung pure-aging
 
 # 3. Region classification (disease-specific / shared / aging-specific)
-sbatch 09_aging_comparison/04_region_classification.sh
+sbatch 08_aging_comparison/04_region_classification.sh
 
 # 4. (Optional) Final replots — used for Fig 13 and Aim 3 summary
-Rscript 09_aging_comparison/replots/Fig13_replot.R
-Rscript 09_aging_comparison/replots/replot_Kidney.R   # Aim 3 Kidney-only summary with OR≥1 filter
+Rscript 08_aging_comparison/replots/Fig13_replot.R
+Rscript 08_aging_comparison/replots/replot_Kidney.R   # Aim 3 Kidney-only summary with OR≥1 filter
 ```
 
 ## Methodology sensitivity tests (`methodology_tests/`)

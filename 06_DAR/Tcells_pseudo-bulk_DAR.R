@@ -69,7 +69,7 @@ contrasts_list <- list(
 exp_thresh <- 0.05
 num_splits <- 10
 padj_cutoff <- 0.05
-min_cells_per_group <- 30
+min_cells_per_group <- 80
 
 # Lung-style: optionally mount fragments onto assay (for track/footprint later)
 mount_fragments <- TRUE

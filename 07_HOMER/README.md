@@ -6,10 +6,8 @@ Run HOMER `findMotifsGenome.pl` on each cell type × direction × background com
 
 For each (cell type, contrast, direction), HOMER is run with two backgrounds:
 
-| Background | Definition | Controls for |
-|---|---|---|
-| **NS** (non-significant) | `padj >= 0.05` peaks (everything DESeq2 tested that wasn't a DAR) | Accessibility-level bias |
-| **Stable** | `padj > 0.9` AND `|log2FC| < 0.05` peaks (truly invariant) | Both accessibility AND cell-type-specific peak architecture |
+- **NS background** (non-significant peaks): `padj >= 0.05` — everything DESeq2 tested that wasn't a DAR. Controls for accessibility-level bias.
+- **Stable background** (truly invariant peaks): `padj > 0.9` AND `abs(log2FC) < 0.05`. Controls for both accessibility AND cell-type-specific peak architecture.
 
 Plus the *reciprocal* tests — background vs opening/closing — giving **8 HOMER runs per cell type per contrast**.
 
@@ -17,20 +15,20 @@ Plus the *reciprocal* tests — background vs opening/closing — giving **8 HOM
 
 ```bash
 # 1. Generate the per-cell-type, per-direction BED files (opening / closing / stable / NS)
-Rscript 08_HOMER/prepare_bed/mk_NS_Stable_files_4tissues.R
+Rscript 07_HOMER/prepare_bed/mk_NS_Stable_files_4tissues.R
 
 # 2. Run the canonical 4-tissue HOMER pipeline (stable + NS backgrounds, 8 comparisons per CT)
-sbatch 08_HOMER/run_homer/run_4tissues_NS-stable_HOMER.sh
+sbatch 07_HOMER/run_homer/run_4tissues_NS-stable_HOMER.sh
 
 # 3. (Optional) Kidney-specific rerun with focused contrasts:
-sbatch 08_HOMER/run_homer/kidney_rerun/run_kidney_homer_stable_bg.sh
-sbatch 08_HOMER/run_homer/kidney_rerun/run_kidney_homer_NS_Day42_only.sh
+sbatch 07_HOMER/run_homer/kidney_rerun/run_kidney_homer_stable_bg.sh
+sbatch 07_HOMER/run_homer/kidney_rerun/run_kidney_homer_NS_Day42_only.sh
 
 # 4. (Optional) Closing-vs-opening identity-TF baseline (used for Fig 11)
-sbatch 08_HOMER/run_homer/run_HOMER_closing_vs_opening.sh
+sbatch 07_HOMER/run_homer/run_HOMER_closing_vs_opening.sh
 
 # 5. (Optional) Resume incomplete Lung NS run (if it timed out)
-bash 08_HOMER/run_homer/resume_lung_homer_NS.sh
+bash 07_HOMER/run_homer/resume_lung_homer_NS.sh
 ```
 
 The `per_tissue_initial/` directory contains the original whole-DAR HOMER runs (no background separation) — useful for the per-tissue dotplot figures (Fig 13-16) but **not** for the integrated heatmap (Fig 10), which requires the NS/Stable BG outputs.
@@ -49,7 +47,7 @@ ${DATA_ROOT}/DAR/DAR_pseudobulk_DESeq2/DAR_pseudobulk_{tissue}_DESeq2/
     (same structure)
 ```
 
-The `knownResults.txt` files feed every plotting script in `10_figures/Fig10_HOMER_heatmap/`, `10_figures/Fig11_identity_TF/`, `10_figures/Fig12_17_TF_motif_dotplots/`, and `10_figures/per_tissue_HOMER_plots/`.
+The `knownResults.txt` files feed every plotting script in `09_figures/Fig10_HOMER_heatmap/`, `09_figures/Fig11_identity_TF/`, `09_figures/Fig12_17_TF_motif_dotplots/`, and `09_figures/per_tissue_HOMER_plots/`.
 
 ## HOMER tuning
 
@@ -72,4 +70,4 @@ perl configureHomer.pl -install mm10
 export HOMER_HOME=/scratch/user/${USER}/homer
 ```
 
-Edit `HOMER_HOME` at the top of each `08_HOMER/run_homer/*.sh` to point at your install.
+Edit `HOMER_HOME` at the top of each `07_HOMER/run_homer/*.sh` to point at your install.

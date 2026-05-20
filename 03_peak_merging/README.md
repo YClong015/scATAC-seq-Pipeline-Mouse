@@ -29,7 +29,7 @@ These per-tissue consensus BEDs feed into stage 04 to build the cross-tissue uni
 ## QC: count peaks per cell type
 
 ```bash
-bash   10_figures/peak_counts/count_peaks_per_celltype.sh
-Rscript 10_figures/peak_counts/plot_peaks_per_celltype.R
+bash   09_figures/peak_counts/count_peaks_per_celltype.sh
+Rscript 09_figures/peak_counts/plot_peaks_per_celltype.R
 ```
 Produces `peaks_per_celltype.csv` and a faceted bar chart for Figure 5 / Supplementary.

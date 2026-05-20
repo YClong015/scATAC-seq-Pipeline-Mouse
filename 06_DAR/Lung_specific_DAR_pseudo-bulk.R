@@ -38,7 +38,7 @@ contrasts_list      <- list(c("Case", "Control"))
 exp_thresh          <- 0.05
 num_splits          <- 10
 padj_cutoff         <- 0.05
-min_cells_per_group <- 50
+min_cells_per_group <- 80
 
 # -----------------------------
 # 2) Helpers

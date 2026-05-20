@@ -33,7 +33,7 @@ perl configureHomer.pl -install mm10
 export HOMER_HOME=/scratch/user/${USER}/homer
 export PATH=${HOMER_HOME}/bin:${PATH}
 ```
-Most HOMER-running SLURM scripts in `08_HOMER/` set `HOMER_HOME` at the top — adjust there if your install path differs.
+Most HOMER-running SLURM scripts in `07_HOMER/` set `HOMER_HOME` at the top — adjust there if your install path differs.
 
 ## Required environment variables
 

@@ -15,7 +15,7 @@ suppressPackageStartupMessages({
 # -----------------------------
 # Per-tissue universal-peak Seurat object (output of 05_universal_assays/kidney/).
 # This is the OLD universal-peak version (kidney_merged_universal.rds), NOT the
-# v5 figure-only object. See top-level README + 07_DAR/README.md for context.
+# v5 figure-only object. See top-level README + 06_DAR/README.md for context.
 obj_rds_path <- paste0(
   "/QRISdata/Q8448/Mouse_disease_data/Kidney/",
   "kidney_merged_universal.rds"

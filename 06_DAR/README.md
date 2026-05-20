@@ -17,16 +17,16 @@ All four tissues now read their own per-tissue object (no combined integrated ob
 
 ```bash
 # Kidney
-sbatch 07_DAR/kidney_dar.slurm        # invokes Kidney_pseudo-bulk_DAR.R
+sbatch 06_DAR/kidney_dar.slurm        # invokes Kidney_pseudo-bulk_DAR.R
 
 # Lung
-Rscript 07_DAR/Lung_specific_DAR_pseudo-bulk.R
+Rscript 06_DAR/Lung_specific_DAR_pseudo-bulk.R
 
 # Aorta
-Rscript 07_DAR/Aorta_pseudo-bulk_DAR.R
+Rscript 06_DAR/Aorta_pseudo-bulk_DAR.R
 
 # T cells (mounts fragments + DAR — 9 pairwise contrasts among 5 conditions)
-Rscript 07_DAR/Tcells_pseudo-bulk_DAR.R
+Rscript 06_DAR/Tcells_pseudo-bulk_DAR.R
 ```
 
 ## Tissue-specific contrasts
