@@ -9,7 +9,7 @@ Per-tissue Cell Ranger outputs → annotated, QC-passed Seurat object → per-ce
 | Kidney | `${DATA_ROOT}/Kidney/cellranger_unpacked_data/{SRR}_Kidney_atac/{SRR}_Kidney_atac/outs/` — 9 samples (3 Sham, 3 Day14, 3 Day42) |
 | Lung | `${DATA_ROOT}/Lung/Lung_cellatac/{CL...}/outs/` — 6 samples |
 | Aorta | `${DATA_ROOT}/Aorta/Aorta_cellranger_atac/{SRR}_Aorta_atac/outs/` — 2 samples (Control, Challenge) |
-| T cells | `${DATA_ROOT}/Tcells/Tcells_Seurat_filtered.RData` + `atac_fragments.tsv.gz` (from Patrick Lab — see `00_download/tcells_HANDOVER.md`) |
+| T cells | `${DATA_ROOT}/Tcells/Tcells_Seurat_filtered.RData` + `atac_fragments.tsv.gz` (from Christian Lab — see `00_download/tcells_HANDOVER.md`) |
 
 > **Lung note:** there is no preprocessing script for lung in this repo. The lung Seurat object was constructed externally (by the Zhang et al. 2025 authors / Patrick Lab); we load `lung_universal_new_pruned.rds` directly at stage 05.
 
