@@ -1,0 +1,54 @@
+# Conda environment for the Python-side of the pipeline.
+#
+# Create with:
+#   conda env create -f environment/python_env.yml
+#   conda activate scenicplus
+#
+# Two distinct workloads share this env:
+#   1. pycisTopic peak merging (peak_calling.py, consensus_mm10.py, build_universal_scpm.py)
+#   2. scanpy + pydeseq2 aging-DAR re-calling (09_aging_comparison/02_*)
+#
+# The original pipeline used two separate envs (scenicplus + scanpy_env);
+# they're consolidated here for convenience. If you hit a dependency conflict,
+# split back into two envs.
+
+name: scenicplus
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+
+  # Core scientific
+  - numpy>=1.24
+  - pandas>=2.0
+  - scipy
+  - matplotlib
+  - seaborn
+
+  # Single-cell
+  - scanpy>=1.10
+  - anndata
+  - leidenalg
+  - python-igraph
+
+  # Genomic intervals
+  - pyranges>=0.0.129
+  - pybedtools
+
+  # Peak calling
+  - macs2>=2.2.7
+  # pycisTopic itself is pip-installed; pinned for SCENIC+ compatibility
+
+  # DEA
+  - pip:
+    - pycisTopic==1.0.3
+    - pydeseq2>=0.4
+    - scikit-misc
+    - statsmodels
+
+  # Misc
+  - h5py
+  - jupyter
