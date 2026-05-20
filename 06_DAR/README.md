@@ -43,9 +43,9 @@ Rscript 06_DAR/Tcells_pseudo-bulk_DAR.R
 | Parameter | Default | Meaning |
 |---|---|---|
 | `exp.thresh` | 0.05 | Pre-filter: peak must be accessible in ≥5% of cells in foreground OR background |
-| `num.splits` | 10 (5 for small Lung) | Each population randomly split into N pseudo-bulk pools |
+| `num.splits` | 10 (all 4 tissues) | Each population randomly split into N pseudo-bulk pools |
 | `padj.cutoff` | 0.05 | BH FDR threshold for "significant" |
-| `min.cells.per.group` | 80 (Kidney/Aorta/Tcells); 50 (Lung) | Excluded cell types below threshold |
+| `min.cells.per.group` | 80 (all 4 tissues) | Excluded cell types below threshold |
 
 A peak is called a DAR if `padj < 0.05`. Opening = log2FC > 0; closing = log2FC < 0.
 
