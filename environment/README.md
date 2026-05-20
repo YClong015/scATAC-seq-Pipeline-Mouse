@@ -1,6 +1,6 @@
 # Environment setup
 
-## R (4.3.1 or 4.4.2)
+## R (4.4.2)
 
 ```bash
 Rscript environment/R_packages.R
