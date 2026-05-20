@@ -1,4 +1,4 @@
-# Stage 10 — Figures
+# Stage 09 — Figures
 
 All 21 main thesis figures plus supplementary figures. Each subdirectory corresponds to one figure or set of related figures.
 

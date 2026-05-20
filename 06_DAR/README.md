@@ -1,4 +1,4 @@
-# Stage 07 — Pseudo-bulk DAR calling (Aim 2 input)
+# Stage 06 — Pseudo-bulk DAR calling (Aim 2 input)
 
 Per-cell-type, per-contrast differential accessibility via pseudo-bulk DESeq2, using the `apply_DESeq2_test_seurat()` wrapper in `DATesting.R` (Patrick Lab standard, mirrors Squair et al. 2021 recommendations).
 

@@ -1,4 +1,4 @@
-# Stage 09 — Aging chromatin comparison (Aim 3)
+# Stage 08 — Aging chromatin comparison (Aim 3)
 
 Re-call aging DARs from the Lu et al. (2026) mouse aging chromatin atlas using **the same pseudo-bulk DESeq2 pipeline** as for disease, intersect against the disease DARs (stage 07 output), and quantify overlap via Fisher's exact test + Pearson r.
 

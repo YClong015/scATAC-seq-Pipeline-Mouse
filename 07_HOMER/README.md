@@ -1,4 +1,4 @@
-# Stage 08 — HOMER motif enrichment
+# Stage 07 — HOMER motif enrichment
 
 Run HOMER `findMotifsGenome.pl` on each cell type × direction × background combination to identify enriched TF motifs.
 
