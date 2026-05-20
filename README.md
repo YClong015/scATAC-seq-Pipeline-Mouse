@@ -26,12 +26,12 @@ Disease chromatin remodelling is consistent with the SIPHON model (Patrick et al
                             └────────────┬────────────┘
                                          │
                                          ▼
-   Kidney  Lung  Aorta             ┌─────────────────────────┐
-   (Cell Ranger ATAC outs/)        │ 01_preprocessing        │  QC + Harmony + cell-type
-                  +                │  (one R script/tissue)  │  annotation + SplitFragments
-   T cells: Tcells_Seurat_         └────────────┬────────────┘
-   filtered.RData (Ralph)                       │
-                                                ▼
+Kidney  Lung  Aorta         ┌─────────────────────────┐
+(Cell Ranger ATAC outs/)    │ 01_preprocessing        │  QC + Harmony + cell-type
+         +                  │  (one R script/tissue)  │  annotation + SplitFragments
+T cells: Tcells_Seurat_     └────────────┬────────────┘
+filtered.RData (Ralph)                   │
+                                         ▼
                             ┌─────────────────────────┐
                             │ 02_peak_calling         │  MACS2 (pycisTopic) per cell type
                             └────────────┬────────────┘  → narrowPeak
@@ -49,11 +49,11 @@ Disease chromatin remodelling is consistent with the SIPHON model (Patrick et al
                             └─────┬───────────────┬───┘  against the universal peak set
                                   │               │
                                   ▼               ▼
-                            ┌──────────┐    ┌────────────────────┐
-                            │ 06_integ │    │ 07_DAR             │  Pseudo-bulk DESeq2
-                            │ Harmony  │    │ per cell type      │  (DATesting.R)
-                            └────┬─────┘    └──────────┬─────────┘
-                                 ▼                     ▼
+                            ┌──────────┐    ┌──────────────┐
+                            │ 06_integ │    │ 07_DAR       │  Pseudo-bulk DESeq2
+                            │ Harmony  │    │ per cell type│  (DATesting.R)
+                            └────┬─────┘    └─────┬────────┘
+                                 ▼                ▼
                             ┌─────────────────────────┐ Opening / closing DARs
                             │ 08_HOMER                │  4 backgrounds × 2 directions
                             └────────────┬────────────┘  per cell type per tissue
@@ -148,16 +148,6 @@ thesis_reference/        — Thesis markdown + figure structure outline
 
 ---
 
-## Citation
-
-If you use this pipeline or its results, please cite the thesis (forthcoming) and the underlying datasets:
-
-> Zheng Y. (2026). *Chromatin Accessibility and Transcription Factor Regulation in Age-Related Diseases*. MBioinformatics thesis, University of Queensland.
-
-Please also cite Muto et al. 2024, Zhang Q. 2025, Zhang C. 2023, Lu et al. 2026, and Patrick et al. 2024 — see `thesis_reference/Thesis_Yanchen_Zheng_FULL.md` §References for full bibliographic detail.
-
----
-
 ## Reproducibility notes
 
 - All randomised steps use `set.seed(2024)` (R) or `random_state=2024` (Python).
@@ -168,6 +158,3 @@ Please also cite Muto et al. 2024, Zhang Q. 2025, Zhang C. 2023, Lu et al. 2026,
 
 Code: MIT. Documentation: CC-BY-4.0. Data: subject to the licences of the underlying primary datasets.
 
-## Contact
-
-Yanchen Zheng (`yanchenzheng34@gmail.com`) · Patrick Lab, UQ IMB
