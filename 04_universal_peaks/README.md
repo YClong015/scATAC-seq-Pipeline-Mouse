@@ -40,11 +40,6 @@ The SLURM wrapper sets environment variables for the python script:
 | T cells | 145,370 |
 | **Universal (after merge)** | **667,473** |
 
-## ⚠ Why not the SCPM-filtered v5 set?
-
-You may see references to `universal_peaks_v5/consensus_regions_v5.bed.gz` elsewhere in the codebase. That set was rebuilt later via `build_universal_scpm.py` (two-stage merge + SCPM > 1 filter) **for figure/visualisation purposes only** and is **not** what the canonical DAR analysis used. The thesis DAR results (and all HOMER + aging-comparison results) are based on the OLD universal peak set above.
-
-The v5 build script and its scaffolding have therefore been excluded from this repo to maintain pipeline consistency.
 
 ## Aim-1 peak-count quantification (Figure 5 + 6)
 
