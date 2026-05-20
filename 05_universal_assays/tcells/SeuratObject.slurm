@@ -14,20 +14,20 @@ set -euo pipefail
 module load r/4.4.2
 
 # 1. Universal Peak file (v5)
-UP="/QRISdata/Q8448/Mouse_disease_data/universal_peaks_v5/consensus_regions_v5.bed.gz"
+UP="/QRISdata/Q8448/Mouse_disease_data/Universal_peaks/Kidney_Aorta_Tcells_Lung/consensus_peak_calling/consensus_regions.bed.gz"
 
 # 2. Input
 OBJ="/QRISdata/Q8448/Mouse_disease_data/Tcells/tcells_processed.rds"
 
 # 3. Output
-OUT="/QRISdata/Q8448/Mouse_disease_data/Tcells/tcells_universal_v5.rds"
+OUT="/QRISdata/Q8448/Mouse_disease_data/Tcells/tcells_universal.rds"
 mkdir -p "$(dirname "${OUT}")"
 
 # 4. Fragment file (the only one)
 FRAG_FILE="/QRISdata/Q8448/Mouse_disease_data/Tcells/atac_fragments.tsv.gz"
 
 # 5. Script path
-SCRIPT="/home/s4869245/scripts/integration_analysis/Tcell_seurat_obj/SeuratObject.R"
+SCRIPT="./SeuratObject.R"
 
 echo "Processing Tcells using deMultliplex2_final_mapped..."
 

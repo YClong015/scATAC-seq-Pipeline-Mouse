@@ -1,9 +1,8 @@
 #!/usr/bin/env Rscript
 
 # ============================================================
-# Kidney pseudo-bulk DAR pipeline (DESeq2 via DATesting.R)
-# Uses kidney_universal_v5.rds (tissue-specific object)
-# Same structure as Lung_specific_DAR_pseudo-bulk.R
+# Aorta pseudo-bulk DAR pipeline (DESeq2 via DATesting.R)
+# Per-tissue object input — same template as Lung / Kidney / Tcells.
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -16,10 +15,13 @@ suppressPackageStartupMessages({
 # -----------------------------
 # 0) Paths
 # -----------------------------
-obj_rds_path     <- "/QRISdata/Q8448/Mouse_disease_data/Kidney/kidney_universal_v5.rds"
+# Per-tissue universal-peak Seurat object (output of 05_universal_assays/aorta/).
+# This is the OLD universal-peak version (Aorta_integrated_universal.rds),
+# NOT the v5 figure-only object.
+obj_rds_path     <- "/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_integrated_universal.rds"
 datesting_r_path <- "/home/s4869245/scripts/DAR/DATesting.R"
 
-out_dir <- "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_pseudobulk_Kidney_v5_DESeq2"
+out_dir <- "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_pseudobulk_DESeq2/DAR_pseudobulk_Aorta_DESeq2"
 
 dir.create(file.path(out_dir, "DAR_tables"), recursive = TRUE, showWarnings = FALSE)
 dir.create(file.path(out_dir, "DAR_BED"),   showWarnings = FALSE)
@@ -30,15 +32,11 @@ dir.create(file.path(out_dir, "Figures"),   showWarnings = FALSE)
 # 1) Parameters
 # -----------------------------
 assay_name          <- "peaks_universal"
-group_col           <- "condition"
+group_col           <- "Group"             # Aorta uses "Group" metadata column
 celltype_col        <- "cell_type"
 
-group_levels        <- c("Sham", "Day14", "Day42")
-contrasts_list      <- list(
-  c("Day14", "Sham"),
-  c("Day42", "Sham"),
-  c("Day42", "Day14")
-)
+group_levels        <- c("Control", "Challenge")
+contrasts_list      <- list(c("Challenge", "Control"))
 
 exp_thresh          <- 0.05
 num_splits          <- 10
@@ -77,7 +75,7 @@ source(datesting_r_path)
 stopifnot(exists("apply_DESeq2_test_seurat"), exists("GetExpressedPeaks"))
 
 if (!file.exists(obj_rds_path)) stop("Object not found: ", obj_rds_path)
-message("Loading Kidney object...")
+message("Loading Aorta object...")
 obj <- readRDS(obj_rds_path)
 message("Loaded. Cells = ", ncol(obj))
 
@@ -85,7 +83,8 @@ if (!assay_name %in% Assays(obj))
   stop("Assay not found: ", assay_name,
        ". Available: ", paste(Assays(obj), collapse = ", "))
 if (!group_col %in% colnames(obj[[]]))
-  stop("Missing group column: ", group_col)
+  stop("Missing group column: ", group_col,
+       ". Available: ", paste(colnames(obj[[]]), collapse = ", "))
 if (!celltype_col %in% colnames(obj[[]]))
   stop("Missing celltype column: ", celltype_col)
 
@@ -98,7 +97,7 @@ obj$dar_group     <- as.character(obj[[group_col]][, 1])
 obj$cell_type_dar <- as.character(obj[[celltype_col]][, 1])
 
 write.csv(as.data.frame(table(obj$dar_group, useNA = "ifany")),
-          file.path(out_dir, "QC", "Kidney_group_counts_raw.csv"), row.names = FALSE)
+          file.path(out_dir, "QC", "Aorta_group_counts_raw.csv"), row.names = FALSE)
 
 obj <- subset(obj, subset = dar_group %in% group_levels)
 obj$dar_group <- factor(obj$dar_group, levels = group_levels)
@@ -110,9 +109,9 @@ message("\n=== Cells per cell type x group ===")
 print(ct_grp[order(ct_grp$CellType), ], row.names = FALSE)
 
 write.csv(ct_grp,
-          file.path(out_dir, "QC", "Kidney_celltype_by_group_counts.csv"), row.names = FALSE)
+          file.path(out_dir, "QC", "Aorta_celltype_by_group_counts.csv"), row.names = FALSE)
 write.csv(as.data.frame(table(obj$dar_group)),
-          file.path(out_dir, "QC", "Kidney_group_counts_filtered.csv"), row.names = FALSE)
+          file.path(out_dir, "QC", "Aorta_group_counts_filtered.csv"), row.names = FALSE)
 
 eligible_celltypes <- ct_grp %>%
   group_by(CellType) %>%
@@ -214,7 +213,7 @@ for (ct in eligible_celltypes) {
                           paste0(out_label, "__pvalue_hist.png")))
 
     all_summary[[paste(ct, contrast_name, sep = "__")]] <- data.frame(
-      tissue         = "Kidney",
+      tissue         = "Aorta",
       cell_type      = ct,
       contrast       = contrast_name,
       group1         = g1,
@@ -245,29 +244,29 @@ if (length(all_summary) == 0) stop("No DAR results generated.")
 
 summary_df <- bind_rows(all_summary)
 write.csv(summary_df,
-          file.path(out_dir, "DAR_pseudobulk_summary_Kidney_v5.csv"), row.names = FALSE)
+          file.path(out_dir, "DAR_pseudobulk_summary_Aorta.csv"), row.names = FALSE)
 
 plot_df <- bind_rows(
   summary_df %>% transmute(cell_type, contrast, direction = "Opening", n_DAR = n_opening),
   summary_df %>% transmute(cell_type, contrast, direction = "Closing", n_DAR = n_closing)
 )
 write.csv(plot_df,
-          file.path(out_dir, "DAR_pseudobulk_summary_Kidney_v5_long.csv"), row.names = FALSE)
+          file.path(out_dir, "DAR_pseudobulk_summary_Aorta_long.csv"), row.names = FALSE)
 
 p_counts <- ggplot(plot_df, aes(x = cell_type, y = n_DAR, fill = direction)) +
   geom_col(position = "dodge") +
   facet_wrap(~ contrast, nrow = 1, scales = "free_y") +
   scale_fill_manual(values = c(Opening = "#D73027", Closing = "#4575B4")) +
-  labs(title = "Kidney pseudo-bulk DAR counts (DESeq2, kidney_universal_v5)",
+  labs(title = "Aorta pseudo-bulk DAR counts (DESeq2, Challenge vs Control)",
        x = "Cell type", y = "Number of DARs") +
   theme_bw(base_size = 12) +
   theme(plot.title  = element_text(hjust = 0.5, face = "bold"),
         axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text  = element_text(face = "bold"))
 
-ggsave(file.path(out_dir, "Figures", "Kidney_DAR_counts_barplot.pdf"),
+ggsave(file.path(out_dir, "Figures", "Aorta_DAR_counts_barplot.pdf"),
        p_counts, width = 14, height = 6)
-ggsave(file.path(out_dir, "Figures", "Kidney_DAR_counts_barplot.png"),
+ggsave(file.path(out_dir, "Figures", "Aorta_DAR_counts_barplot.png"),
        p_counts, width = 14, height = 6, dpi = 300)
 
 message("\nDone. Output: ", out_dir)

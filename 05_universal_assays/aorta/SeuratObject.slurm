@@ -15,19 +15,19 @@ set -euo pipefail
 module load r/4.4.2
 
 # Universal Peaks BED file
-UP="/QRISdata/Q8448/Mouse_disease_data/universal_peaks_v5/consensus_regions_v5.bed.gz"
+UP="/QRISdata/Q8448/Mouse_disease_data/Universal_peaks/Kidney_Aorta_Tcells_Lung/consensus_peak_calling/consensus_regions.bed.gz"
 
 # Input Seurat Object
 OBJ="/QRISdata/Q8448/Mouse_disease_data/Aorta/aorta_filtered_obj.rds"
 
 # Output Seurat Object
-OUT="/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_universal_v5.rds"
+OUT="/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_integrated_universal.rds"
 
 # Fragments template
 FRAG_TPL="/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_cellranger_atac/{id}/outs/fragments.tsv.gz"
 
 # Path to the NEW R script
-SCRIPT="/home/s4869245/scripts/integration_analysis/Aortic_seurat_obj/SeuratObject.R"
+SCRIPT="./SeuratObject.R"
 
 echo "Starting Rscript..."
 
