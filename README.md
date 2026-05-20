@@ -2,7 +2,7 @@
 
 Cross-tissue single-cell ATAC-seq analysis of four mouse models of age-related disease — kidney ischemia-reperfusion injury (IRI), lung COPD, aortic aneurysm/dissection (AAD), and chronic T-cell stimulation — integrated against the organism-wide mouse aging chromatin atlas (Lu et al., 2026, *Science*).
 
-This repository accompanies the BIOX7026 Master's thesis of **Yanchen Zheng** (UQ IMB, Patrick Lab, 2026).
+This repository accompanies the BIOX7026 Master's thesis of **Yanchen Zheng** (UQ IMB, Christian Lab supervised by Ralph Patrick, 2026).
 
 ---
 
