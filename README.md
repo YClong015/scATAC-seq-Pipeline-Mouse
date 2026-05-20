@@ -159,6 +159,3 @@ Note: the 4-tissue Harmony integration step (used only to make the integrated UM
 
 Code: MIT. Documentation: CC-BY-4.0. Data: subject to the licences of the underlying primary datasets.
 
-## Contact
-
-Yanchen Zheng (`yanchenzheng34@gmail.com`) · Patrick Lab, UQ IMB
