@@ -58,22 +58,6 @@ for aging_tsv in "${AGING_DIR}"/*_Aged_vs_Adult_DAR.tsv; do
     n_ac=$(wc -l < "${TMP_DIR}/${base}_aging_close.bed")
     echo "  ${base}: aging_open=${n_ao}  aging_close=${n_ac}"
 
-    # ── Relaxed aging BED (padj<0.2) ──────────────────────────
-    awk -F'\t' '
-      NR>1 && $6~/^[0-9]/ && $6+0 < 0.2 && $2+0 > 0 {
-        gsub(/:/, "\t", $7); gsub(/-/, "\t", $7); print $7
-      }' "${aging_tsv}" | sort -k1,1 -k2,2n \
-      > "${TMP_DIR}/${base}_aging_open_relaxed.bed"
-
-    awk -F'\t' '
-      NR>1 && $6~/^[0-9]/ && $6+0 < 0.2 && $2+0 < 0 {
-        gsub(/:/, "\t", $7); gsub(/-/, "\t", $7); print $7
-      }' "${aging_tsv}" | sort -k1,1 -k2,2n \
-      > "${TMP_DIR}/${base}_aging_close_relaxed.bed"
-
-    n_aor=$(wc -l < "${TMP_DIR}/${base}_aging_open_relaxed.bed")
-    n_acr=$(wc -l < "${TMP_DIR}/${base}_aging_close_relaxed.bed")
-    echo "  ${base}: aging_open_relaxed=${n_aor}  aging_close_relaxed=${n_acr}"
 
     # ── Disease BED (our peaks: chr1-start-end) ──────────────
     # Columns: peak(1=chr-start-end) baseMean(2) log2FC(3) ... padj(7)
@@ -159,13 +143,10 @@ for f in sorted(os.listdir(TMP_DIR)):
 
     ao  = f"{TMP_DIR}/{base}_aging_open.bed"
     ac  = f"{TMP_DIR}/{base}_aging_close.bed"
-    aor = f"{TMP_DIR}/{base}_aging_open_relaxed.bed"
-    acr = f"{TMP_DIR}/{base}_aging_close_relaxed.bed"
     do  = f"{TMP_DIR}/{base}_disease_open.bed"
     dc  = f"{TMP_DIR}/{base}_disease_close.bed"
 
     n_ao  = count_bed(ao);  n_ac  = count_bed(ac)
-    n_aor = count_bed(aor); n_acr = count_bed(acr)
     n_do  = count_bed(do);  n_dc  = count_bed(dc)
 
     if n_do == 0 and n_dc == 0:
@@ -175,22 +156,16 @@ for f in sorted(os.listdir(TMP_DIR)):
     cc   = bedtools_overlap(dc, ac)
     oc   = bedtools_overlap(do, ac)
     co   = bedtools_overlap(dc, ao)
-    oo_r = bedtools_overlap(do, aor)
-    cc_r = bedtools_overlap(dc, acr)
 
     row = dict(
         tissue=tissue, cell_type=ct,
         disease_opening=n_do, disease_closing=n_dc,
         aging_opening=n_ao,   aging_closing=n_ac,
-        aging_opening_relaxed=n_aor, aging_closing_relaxed=n_acr,
         overlap_open_open=oo, overlap_close_close=cc,
         overlap_open_close=oc, overlap_close_open=co,
-        overlap_open_open_relaxed=oo_r, overlap_close_close_relaxed=cc_r,
         n_tested=n_tested,
         pct_disease_open_in_aging_open=    oo/n_do*100   if n_do else 0,
         pct_disease_close_in_aging_close=  cc/n_dc*100   if n_dc else 0,
-        pct_disease_open_in_aging_open_relaxed=  oo_r/n_do*100 if n_do else 0,
-        pct_disease_close_in_aging_close_relaxed=cc_r/n_dc*100 if n_dc else 0,
     )
     rows.append(row)
     print(f"  {base}: "
@@ -248,10 +223,10 @@ overlap <- overlap %>%
   rowwise() %>%
   mutate(
     N_use      = n_tested,
-    pval_open  = fisher_p(overlap_open_open_relaxed,  aging_opening_relaxed, disease_opening,  N_use),
-    pval_close = fisher_p(overlap_close_close_relaxed, aging_closing_relaxed, disease_closing, N_use),
-    fold_open  = fisher_or(overlap_open_open_relaxed,  aging_opening_relaxed, disease_opening,  N_use),
-    fold_close = fisher_or(overlap_close_close_relaxed, aging_closing_relaxed, disease_closing, N_use),
+    pval_open  = fisher_p(overlap_open_open,  aging_opening, disease_opening,  N_use),
+    pval_close = fisher_p(overlap_close_close, aging_closing, disease_closing, N_use),
+    fold_open  = fisher_or(overlap_open_open,  aging_opening, disease_opening,  N_use),
+    fold_close = fisher_or(overlap_close_close, aging_closing, disease_closing, N_use),
     sig_open   = sig_label(pval_open),
     sig_close  = sig_label(pval_close),
     label      = paste0(tissue, "\n", cell_type)
@@ -260,9 +235,9 @@ overlap <- overlap %>%
 
 write.csv(
   overlap %>% select(tissue, cell_type,
-    disease_opening, aging_opening_relaxed, overlap_open_open_relaxed,
+    disease_opening, aging_opening, overlap_open_open,
     fold_open,  pval_open,  sig_open,
-    disease_closing, aging_closing_relaxed, overlap_close_close_relaxed,
+    disease_closing, aging_closing, overlap_close_close,
     fold_close, pval_close, sig_close),
   file.path(OUT_DIR, "overlap_stats.csv"), row.names = FALSE
 )
@@ -465,33 +440,23 @@ for (f in sort(files)) {
     mutate(
       aging_sig = case_when(
         !is.na(a_padj) & a_padj < 0.05  ~ "Aging sig (padj<0.05)",
-        !is.na(a_padj) & a_padj < 0.2   ~ "Aging trending (padj<0.2)",
         TRUE                             ~ "Not sig in aging"
       ),
       # Factor order: Not sig FIRST so it plots underneath as grey background;
       # Sig LAST so it plots on top.
       aging_sig = factor(aging_sig, levels = c("Not sig in aging",
-                                               "Aging trending (padj<0.2)",
                                                "Aging sig (padj<0.05)"))
     ) %>%
     arrange(aging_sig)
 
   r_all   <- cor(dat$d_lfc, dat$a_lfc, method = "pearson")
   aging_s <- filter(dat, aging_sig == "Aging sig (padj<0.05)")
-  # Relaxed set: sig + trending — used for regression when sig alone too small
-  aging_r <- filter(dat, aging_sig %in% c("Aging sig (padj<0.05)",
-                                           "Aging trending (padj<0.2)"))
 
   if (nrow(aging_s) < 5) {
     message("  Note: aging-sig n=", nrow(aging_s), " < 5, r_aging_sig set to NA: ", base)
     r_aging <- NA_real_
   } else {
     r_aging <- cor(aging_s$d_lfc, aging_s$a_lfc, method = "pearson")
-  }
-  if (nrow(aging_r) < 5) {
-    r_aging_relaxed <- NA_real_
-  } else {
-    r_aging_relaxed <- cor(aging_r$d_lfc, aging_r$a_lfc, method = "pearson")
   }
 
   dis_open  <- filter(dat, d_lfc > 0)
@@ -502,36 +467,27 @@ for (f in sort(files)) {
   label_r <- sprintf(
     paste0("r = %.3f (all, n=%d)\n",
            "r = %s (aging sig, n=%d)\n",
-           "r = %s (sig+trend, n=%d)\n",
            "Concordant: open %.0f%% | close %.0f%%"),
     r_all, nrow(dat),
     if (is.na(r_aging))         "NA" else sprintf("%.3f", r_aging), nrow(aging_s),
-    if (is.na(r_aging_relaxed)) "NA" else sprintf("%.3f", r_aging_relaxed), nrow(aging_r),
     ifelse(is.na(pct_open_concordant), 0, pct_open_concordant),
     ifelse(is.na(pct_close_concordant), 0, pct_close_concordant)
   )
 
   sig_colors <- c("Not sig in aging"          = "grey80",
-                  "Aging trending (padj<0.2)" = "#F4A582",
                   "Aging sig (padj<0.05)"     = "#B2182B")
   sig_alpha  <- c("Not sig in aging"          = 0.25,
-                  "Aging trending (padj<0.2)" = 0.7,
                   "Aging sig (padj<0.05)"     = 0.9)
 
   p <- ggplot(dat, aes(x = d_lfc, y = a_lfc, color = aging_sig,
                        alpha = aging_sig)) +
     geom_point(size = 0.9) +
+    # Regression line on aging-sig subset (padj<0.05)
     { if (nrow(aging_s) >= 5)
         geom_smooth(data = aging_s, aes(x = d_lfc, y = a_lfc),
                     method = "lm", se = TRUE,
                     color = "#B2182B", fill = "#FDDBC7",
-                    linewidth = 0.9, inherit.aes = FALSE)
-      else if (nrow(aging_r) >= 5)
-        geom_smooth(data = aging_r, aes(x = d_lfc, y = a_lfc),
-                    method = "lm", se = TRUE,
-                    color = "#F4A582", fill = "#FDDBC7",
-                    linewidth = 0.9, linetype = "longdash",
-                    inherit.aes = FALSE) } +
+                    linewidth = 0.9, inherit.aes = FALSE) } +
     geom_hline(yintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.4) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.4) +
     annotate("text", x = -Inf, y = Inf, label = label_r,
@@ -551,7 +507,6 @@ for (f in sort(files)) {
     tissue = tissue, cell_type = ct,
     r_all = r_all, n_all = nrow(dat),
     r_aging_sig = r_aging, n_aging_sig = nrow(aging_s),
-    r_aging_relaxed = r_aging_relaxed, n_aging_relaxed = nrow(aging_r),
     pct_open_concordant  = ifelse(is.na(pct_open_concordant),  NA_real_, pct_open_concordant),
     pct_close_concordant = ifelse(is.na(pct_close_concordant), NA_real_, pct_close_concordant)
   )
@@ -560,7 +515,6 @@ for (f in sort(files)) {
 empty_r <- data.frame(tissue=character(), cell_type=character(),
                        r_all=numeric(), n_all=integer(),
                        r_aging_sig=numeric(), n_aging_sig=integer(),
-                       r_aging_relaxed=numeric(), n_aging_relaxed=integer(),
                        pct_open_concordant=numeric(), pct_close_concordant=numeric())
 r_stats_df <- if (length(r_stats) > 0) do.call(rbind, r_stats) else empty_r
 write.csv(r_stats_df, file.path(OUT_DIR, "scatter_r_stats.csv"), row.names = FALSE)

@@ -53,7 +53,7 @@ Both produce a CSV comparing DAR counts across the 2–4 variants. Used during m
 **Fisher's exact test** (one-sided, "greater"):
 - 2×2 table: disease-DAR × aging-DAR membership
 - `N` = total peaks tested by DESeq2 in the aging atlas for that cell type
-- Aging relaxed to `padj < 0.2` to maintain test power
+- Both disease and aging significance use `padj < 0.05`
 - Output: OR (odds ratio) + p-value + significance star
 
 **Pearson r**:

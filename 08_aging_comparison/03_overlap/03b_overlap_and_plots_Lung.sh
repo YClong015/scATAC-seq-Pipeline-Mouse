@@ -58,22 +58,6 @@ for aging_tsv in "${AGING_DIR}"/*_Aged_vs_Young_DAR.tsv; do
     n_ac=$(wc -l < "${TMP_DIR}/${base}_aging_close.bed")
     echo "  ${base}: aging_open=${n_ao}  aging_close=${n_ac}"
 
-    # ── Relaxed aging BED (padj<0.2) ──────────────────────────
-    awk -F'\t' '
-      NR>1 && $6~/^[0-9]/ && $6+0 < 0.2 && $2+0 > 0 {
-        gsub(/:/, "\t", $7); gsub(/-/, "\t", $7); print $7
-      }' "${aging_tsv}" | sort -k1,1 -k2,2n \
-      > "${TMP_DIR}/${base}_aging_open_relaxed.bed"
-
-    awk -F'\t' '
-      NR>1 && $6~/^[0-9]/ && $6+0 < 0.2 && $2+0 < 0 {
-        gsub(/:/, "\t", $7); gsub(/-/, "\t", $7); print $7
-      }' "${aging_tsv}" | sort -k1,1 -k2,2n \
-      > "${TMP_DIR}/${base}_aging_close_relaxed.bed"
-
-    n_aor=$(wc -l < "${TMP_DIR}/${base}_aging_open_relaxed.bed")
-    n_acr=$(wc -l < "${TMP_DIR}/${base}_aging_close_relaxed.bed")
-    echo "  ${base}: aging_open_relaxed=${n_aor}  aging_close_relaxed=${n_acr}"
 
     # ── Disease BED (our peaks: chr1-start-end) ──────────────
     # Columns: peak(1=chr-start-end) baseMean(2) log2FC(3) ... padj(7)
@@ -159,13 +143,10 @@ for f in sorted(os.listdir(TMP_DIR)):
 
     ao  = f"{TMP_DIR}/{base}_aging_open.bed"
     ac  = f"{TMP_DIR}/{base}_aging_close.bed"
-    aor = f"{TMP_DIR}/{base}_aging_open_relaxed.bed"
-    acr = f"{TMP_DIR}/{base}_aging_close_relaxed.bed"
     do  = f"{TMP_DIR}/{base}_disease_open.bed"
     dc  = f"{TMP_DIR}/{base}_disease_close.bed"
 
     n_ao  = count_bed(ao);  n_ac  = count_bed(ac)
-    n_aor = count_bed(aor); n_acr = count_bed(acr)
     n_do  = count_bed(do);  n_dc  = count_bed(dc)
 
     if n_do == 0 and n_dc == 0:
@@ -175,22 +156,16 @@ for f in sorted(os.listdir(TMP_DIR)):
     cc   = bedtools_overlap(dc, ac)
     oc   = bedtools_overlap(do, ac)
     co   = bedtools_overlap(dc, ao)
-    oo_r = bedtools_overlap(do, aor)
-    cc_r = bedtools_overlap(dc, acr)
 
     row = dict(
         tissue=tissue, cell_type=ct,
         disease_opening=n_do, disease_closing=n_dc,
         aging_opening=n_ao,   aging_closing=n_ac,
-        aging_opening_relaxed=n_aor, aging_closing_relaxed=n_acr,
         overlap_open_open=oo, overlap_close_close=cc,
         overlap_open_close=oc, overlap_close_open=co,
-        overlap_open_open_relaxed=oo_r, overlap_close_close_relaxed=cc_r,
         n_tested=n_tested,
         pct_disease_open_in_aging_open=    oo/n_do*100   if n_do else 0,
         pct_disease_close_in_aging_close=  cc/n_dc*100   if n_dc else 0,
-        pct_disease_open_in_aging_open_relaxed=  oo_r/n_do*100 if n_do else 0,
-        pct_disease_close_in_aging_close_relaxed=cc_r/n_dc*100 if n_dc else 0,
     )
     rows.append(row)
     print(f"  {base}: "
@@ -248,10 +223,10 @@ overlap <- overlap %>%
   rowwise() %>%
   mutate(
     N_use      = n_tested,
-    pval_open  = fisher_p(overlap_open_open_relaxed,  aging_opening_relaxed, disease_opening,  N_use),
-    pval_close = fisher_p(overlap_close_close_relaxed, aging_closing_relaxed, disease_closing, N_use),
-    fold_open  = fisher_or(overlap_open_open_relaxed,  aging_opening_relaxed, disease_opening,  N_use),
-    fold_close = fisher_or(overlap_close_close_relaxed, aging_closing_relaxed, disease_closing, N_use),
+    pval_open  = fisher_p(overlap_open_open,  aging_opening, disease_opening,  N_use),
+    pval_close = fisher_p(overlap_close_close, aging_closing, disease_closing, N_use),
+    fold_open  = fisher_or(overlap_open_open,  aging_opening, disease_opening,  N_use),
+    fold_close = fisher_or(overlap_close_close, aging_closing, disease_closing, N_use),
     sig_open   = sig_label(pval_open),
     sig_close  = sig_label(pval_close),
     label      = paste0(tissue, "\n", cell_type)
@@ -260,9 +235,9 @@ overlap <- overlap %>%
 
 write.csv(
   overlap %>% select(tissue, cell_type,
-    disease_opening, aging_opening_relaxed, overlap_open_open_relaxed,
+    disease_opening, aging_opening, overlap_open_open,
     fold_open,  pval_open,  sig_open,
-    disease_closing, aging_closing_relaxed, overlap_close_close_relaxed,
+    disease_closing, aging_closing, overlap_close_close,
     fold_close, pval_close, sig_close),
   file.path(OUT_DIR, "overlap_stats.csv"), row.names = FALSE
 )
@@ -465,11 +440,9 @@ for (f in sort(files)) {
     mutate(
       aging_sig = case_when(
         !is.na(a_padj) & a_padj < 0.05  ~ "Aging sig (padj<0.05)",
-        !is.na(a_padj) & a_padj < 0.2   ~ "Aging trending (padj<0.2)",
         TRUE                             ~ "Not sig in aging"
       ),
       aging_sig = factor(aging_sig, levels = c("Aging sig (padj<0.05)",
-                                               "Aging trending (padj<0.2)",
                                                "Not sig in aging"))
     )
 
@@ -495,10 +468,8 @@ for (f in sort(files)) {
   )
 
   sig_colors <- c("Aging sig (padj<0.05)" = "#B2182B",
-                  "Aging trending (padj<0.2)" = "#F4A582",
                   "Not sig in aging" = "grey80")
   sig_alpha  <- c("Aging sig (padj<0.05)" = 0.9,
-                  "Aging trending (padj<0.2)" = 0.7,
                   "Not sig in aging" = 0.25)
 
   p <- ggplot(dat, aes(x = d_lfc, y = a_lfc, color = aging_sig)) +
