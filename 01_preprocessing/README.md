@@ -59,7 +59,7 @@ The `SplitFragments()` step (inside each tissue's R script) writes one per-cell-
 
 | Tissue | Cell types after annotation |
 |---|---|
-| Kidney | PT, Injured_PT, TAL, DCT_CNT, DTL_ATL, PC_URO, IC, EC, Pen, PODO_PEC, LEUK |
+| Kidney | PCT, PST, Injured_PT, TAL, DCT_CNT, DTL_ATL, PC_URO, IC, EC, FIB, PODO_PEC, LEUK |
 | Lung | AT2, B, Ciliated, EC-vasc, Eosinophils, Fib, Mac-alv, Mac-inter, Mesothelial, Mo-Ly6c+, NK, Pen, SMCs, T (Low Quality cluster removed) |
 | Aorta | Endothelial, Fibroblast, Mac, Pericyte, SMC, T-cell |
 | T cells | Naive_T, Naive_CD8_T, Effector_CD8_T, Cytotoxic_CD8_T, CD8_Eff, Memory_CD8_T, Treg, Tfh_like_T, NK (B_cell + Low_quality removed) |
