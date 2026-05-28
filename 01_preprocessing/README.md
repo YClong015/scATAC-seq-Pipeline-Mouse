@@ -62,4 +62,25 @@ The `SplitFragments()` step (inside each tissue's R script) writes one per-cell-
 | Kidney | PCT, PST, Injured_PT, TAL, DCT_CNT, DTL_ATL, PC_URO, IC, EC, FIB, PODO_PEC, LEUK |
 | Lung | AT2, B, Ciliated, EC-vasc, Eosinophils, Fib, Mac-alv, Mac-inter, Mesothelial, Mo-Ly6c+, NK, Pen, SMCs, T (Low Quality cluster removed) |
 | Aorta | Endothelial, Fibroblast, Mac, Pericyte, SMC, T-cell |
-| T cells | Naive_T, Naive_CD8_T, Effector_CD8_T, Cytotoxic_CD8_T, CD8_Eff, Memory_CD8_T, Treg, Tfh_like_T, NK (B_cell + Low_quality removed) |
+| T cells | Naive_central_T, Activated_Cd69_T, Effector_SLEC_CD8, Exhausted_Tex_CD8, Treg, TRM_CD8_CD103, TRM_CD8_CD49a, Tpex_Tfh_like |
+
+### T-cell re-annotation (QC update)
+
+The initial T-cell annotation (`Tcell_scATAC.R`) was revised after marker-level
+QC. Because the T-cell dataset is **10x Multiome (RNA + ATAC)**, the real GEX
+(`SCT` assay; ~471 genes/cell) was used — rather than ATAC gene-activity — to
+validate cluster identity against the consensus T-cell nomenclature
+(Masopust et al., *Nat Rev Immunol* 2026). `FindAllMarkers` showed that several
+clusters in the original annotation were contaminating non-T cells carried over
+from the CD8 enrichment: two B-cell clusters (Pax5/Ebf1/Cd79a/b), one plasma-cell
+cluster (Sdc1/Jchain/Igkc; originally mis-labelled "NK"), and myeloid/endothelial
+residuals (Adgre1/Pparg; Vwf). These were removed and the ~6,800 bona fide T cells
+re-clustered and re-annotated:
+
+- `Tcell_clean_recluster.R` — remove contamination, re-embed, FindAllMarkers + Masopust-marker z-score
+- `Tcell_final_annotate.R` — final cell-type assignment + annotated UMAP
+
+Marker basis (Masopust 2026 backbone + additional primary sources where needed):
+SLEC/effector (Klrg1/Cx3cr1/Tbx21/Gzmb; Zeb2 — Omilusik et al. 2015 *JEM*),
+exhausted/Tex (Tox/TIM3/PD-1/CD39; Maf, Nr4a2 — Giordano et al. 2015 *EMBO J*),
+Treg (Foxp3/CD25/CTLA4/Helios/GITR), TRM (CD103/CD49a/CXCR6).
