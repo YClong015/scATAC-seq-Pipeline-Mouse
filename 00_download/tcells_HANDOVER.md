@@ -5,7 +5,7 @@ The T-cell scATAC-seq dataset is the in-house multiome dataset of **Mohammadhoss
 | | |
 |---|---|
 | **Wet-lab generation** | Christian Nefzger Lab (primary), with co-supervision by Ralph Patrick, Xiaoli Chen, and Di Yu |
-| **Bioinformatics handover** | Pre-processed by **Dr Ralph Patrick** (Patrick Lab, IMB UQ) → handed over to Yanchen Zheng for the cross-tissue analysis in this thesis |
+| **Bioinformatics handover** | Pre-processed by **Dr Ralph Patrick** → handed over to Yanchen Zheng for the cross-tissue analysis in this thesis |
 | **My (Yanchen's) supervisor** | Ralph Patrick |
 
 ## Wet-lab generation (do NOT re-run)
