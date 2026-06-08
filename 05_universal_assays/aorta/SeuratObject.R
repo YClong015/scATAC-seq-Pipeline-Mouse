@@ -97,7 +97,6 @@ if (mode == "per_sample") {
     frag_path <- gsub("\\{id\\}", id, frag_tpl)
     if (!file.exists(frag_path)) stop(paste0("Missing fragments file: ", frag_path))
 
-    # Get cells for the current sample
     cells_pref <- colnames(obj)[obj[[sample_key]][, 1] == id]
     if (length(cells_pref) == 0) next
     
@@ -116,7 +115,7 @@ if (mode == "per_sample") {
     # Restore the original Seurat names so merging works later
     colnames(mat) <- cells_pref
     counts_list[[id]] <- mat
-  } # The For loop is now correctly closed here!
+  }
 
   if (length(counts_list) == 0) stop("FATAL ERROR: No matrices generated at all!")
   counts <- do.call(cbind, counts_list)

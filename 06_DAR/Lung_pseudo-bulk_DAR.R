@@ -59,7 +59,6 @@ safe_hist <- function(x, title_txt, out_png) {
 ## Load DATesting.R + object
 if (!file.exists(datesting_r_path)) stop("DATesting.R not found: ", datesting_r_path)
 source(datesting_r_path)
-stopifnot(exists("apply_DESeq2_test_seurat"), exists("GetExpressedPeaks"))
 
 if (!file.exists(obj_rds_path)) stop("Object not found: ", obj_rds_path)
 message("Loading Lung object...")
@@ -90,7 +89,6 @@ obj$dar_group <- factor(obj$dar_group, levels = group_levels)
 
 message("Cells after group filter: ", ncol(obj))
 
-# Print and save QC tables
 ct_grp <- as.data.frame(table(CellType = obj$cell_type_dar, Group = obj$dar_group))
 message("\n=== Cells per cell type x group ===")
 print(ct_grp[order(ct_grp$CellType), ], row.names = FALSE)

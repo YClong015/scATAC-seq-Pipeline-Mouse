@@ -53,7 +53,6 @@ for (tis in names(tissue.configs)) {
   message("\n=== ", tis, " | gene: ", cfg$gene, " ===")
   obj <- readRDS(cfg$rds)
   DefaultAssay(obj) <- "peaks_universal"
-  # Add annotation if missing
   if (is.null(Annotation(obj[["peaks_universal"]])))
     Annotation(obj[["peaks_universal"]]) <- annotations
   # Add Tcells cell type annotation from cluster mapping

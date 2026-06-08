@@ -134,7 +134,6 @@ for (i in seq_along(names(tissue.configs))) {
 
   plots.nolabel[[tissue]] <- p.base
 
-  # Add centroid labels for labeled version
   centroids <- make.centroids(df)
   p.labeled <- p.base +
     ggrepel::geom_label_repel(

@@ -62,7 +62,6 @@ safe_hist <- function(x, title_txt, out_png) {
 ## Load DATesting.R + object
 if (!file.exists(datesting_r_path)) stop("DATesting.R not found: ", datesting_r_path)
 source(datesting_r_path)
-stopifnot(exists("apply_DESeq2_test_seurat"), exists("GetExpressedPeaks"))
 
 if (!file.exists(obj_rds_path)) stop("Object not found: ", obj_rds_path)
 message("Loading Aorta object...")

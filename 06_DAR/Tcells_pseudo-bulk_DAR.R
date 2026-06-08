@@ -1,10 +1,7 @@
 #!/usr/bin/env Rscript
 
-# Tcells pseudo-bulk DAR pipeline (DESeq2 via DATesting.R)
-# Lung-style structure:
-# - explicit group mapping from metadata column
-# - optional fragment mounting (recommended for downstream tracks)
-# - FORCED global cell type assignment to "Tcell"
+# Tcells pseudo-bulk DAR pipeline (DESeq2 via DATesting.R).
+# All cells are pooled into a single "Tcell" type before testing.
 
 suppressPackageStartupMessages({
   library(Seurat)
@@ -113,8 +110,6 @@ if (!file.exists(datesting_r_path)) {
   stop_with("DATesting.R not found: ", datesting_r_path)
 }
 source(datesting_r_path)
-stopifnot(exists("apply_DESeq2_test_seurat"))
-stopifnot(exists("GetExpressedPeaks"))
 
 if (!file.exists(obj_rds_path)) stop_with("Object not found: ", obj_rds_path)
 message("Loading Tcells object...")
@@ -376,13 +371,12 @@ p_tile <- ggplot(plot_df, aes(x = contrast, y = cell_type, fill = n_DAR_signed))
   # Note: The text labels still use the absolute positive numbers (n_DAR)
   geom_text(aes(label = n_DAR), size = 3) + 
   facet_wrap(~ direction, nrow = 1) +
-  # Use gradient2 for the red-white-blue diverging color scale
   scale_fill_gradient2(
-    low = "#4575B4",    # Blue represents Closing (mapped to negative values)
-    mid = "white",      # White represents 0
-    high = "#D73027",   # Red represents Opening (mapped to positive values)
+    low = "#4575B4",    # closing
+    mid = "white",
+    high = "#D73027",   # opening
     midpoint = 0,
-    labels = abs,       # Crucial: Ensures the legend displays absolute (positive) numbers!
+    labels = abs,       # show counts as absolute values
     name = "DAR Count"
   ) +
   labs(

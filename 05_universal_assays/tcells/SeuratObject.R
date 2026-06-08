@@ -112,7 +112,6 @@ counts_list <- list()
 if (mode == "per_sample") {
   if (frag_tpl == "") stop("Error: --mode per_sample requires --frag_tpl")
   
-  # Get unique sample IDs from the object
   sample_ids <- sort(unique(obj[[sample_key]][, 1]))
   msg(paste0("Found ", length(sample_ids), " samples to process."))
   print(sample_ids)
@@ -135,10 +134,8 @@ if (mode == "per_sample") {
 
     msg(paste0("Processing Sample: ", id, " ... (", length(cells_pref), " cells)"))
     
-    # Create Fragment Object (skip validation for speed)
     frag <- CreateFragmentObject(path = frag_path, validate.fragments = FALSE)
 
-    # Calculate Feature Matrix
     mat <- FeatureMatrix(
       fragments = frag,
       features = peaks,
@@ -151,7 +148,6 @@ if (mode == "per_sample") {
     }
 
     ## restore original Seurat cell names
-    # This ensures that the new matrix matches the existing object exactly
     if (ncol(mat) == length(cells_pref)) {
         colnames(mat) <- cells_pref
     } else {
@@ -193,14 +189,12 @@ if (is.null(old_annotations)) {
   assay_u <- CreateChromatinAssay(counts = counts, genome = "mm10", annotation = old_annotations)
 }
 
-# Add the new assay to the object
 obj[[assay_out]] <- assay_u
 DefaultAssay(obj) <- assay_out
 
 # Verify dimensions
 msg(paste0("New assay dimensions: ", paste(dim(obj[[assay_out]]), collapse=" x ")))
 
-# Save final object
 saveRDS(obj, out_rds)
 msg(paste0("Success! Object saved to: ", out_rds))
 msg("Done.")

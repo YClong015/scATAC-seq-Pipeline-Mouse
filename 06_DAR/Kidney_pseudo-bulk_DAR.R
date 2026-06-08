@@ -74,8 +74,6 @@ if (!file.exists(datesting_r_path)) {
 source(datesting_r_path)
 
 # Check functions exist
-stopifnot(exists("apply_DESeq2_test_seurat"))
-stopifnot(exists("GetExpressedPeaks"))
 
 ## Load Seurat object
 if (!file.exists(obj_rds_path)) {
@@ -123,7 +121,6 @@ eligible_celltypes <- intersect(
   unique(obj_kidney$cell_type_dar)
 )
 
-# Save QC tables
 write.csv(
   as.data.frame(table(obj_kidney$dar_group)),
   file.path(out_dir, "QC", "Kidney_dar_group_counts.csv"),
@@ -219,7 +216,6 @@ for (ct in eligible_celltypes) {
       next
     }
     
-    # Run pseudo-bulk DAR (DESeq2)
     res <- tryCatch(
       {
         apply_DESeq2_test_seurat(
@@ -271,7 +267,6 @@ for (ct in eligible_celltypes) {
       gsub("\\.", "", sub("^0\\.", "0", format(exp_thresh)))
     )
     
-    # Save tables
     write.table(
       res_df,
       file = file.path(out_dir, "DAR_tables",

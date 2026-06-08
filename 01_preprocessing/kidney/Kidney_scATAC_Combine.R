@@ -159,7 +159,6 @@ for (id in names(obj_list)) {
   
   # 2. TSS Enrichment
   if (!"TSS.enrichment" %in% colnames(x@meta.data)) {
-    # This might take a moment, so we print progress
     print(paste("Calculating TSS for:", id))
     x <- TSSEnrichment(x, fast = FALSE, verbose = FALSE)
   }
@@ -196,13 +195,10 @@ ViewQC <- function(sample_name) {
     stop(paste("Error: Sample", sample_name, "not found in obj_list!"))
   }
   
-  # Get object
   obj <- obj_list[[sample_name]]
   
-  # Define the 5 metrics
   feats <- c("peak_region_fragments", "TSS.enrichment", "nucleosome_signal", "pct_reads_in_peaks")
   
-  # Generate Plot
   p <- VlnPlot(
     object = obj,
     features = feats,
@@ -237,7 +233,6 @@ kidney_merged <- RunTFIDF(kidney_merged)
 kidney_merged <- FindTopFeatures(kidney_merged, min.cutoff = 'q0')
 kidney_merged <- RunSVD(kidney_merged)
 
-# Run Harmony (Correcting Batch)
 kidney_merged <- RunHarmony(
   object = kidney_merged,
   group.by.vars = "dataset",
@@ -263,10 +258,8 @@ kidney_merged <- NormalizeData(
 )
 ## STEP: Save the Integrated Object
 
-# Define output path (modify this path if needed)
 output_file <- file.path(base_dir, "kidney_merged_harmony.rds")
 
-# Save the object
 saveRDS(kidney_merged, file = output_file)
 
 print(paste("Object saved successfully to:", output_file))
@@ -299,7 +292,6 @@ marker_list_clean <- list(
 )
 
 # 2. Switch to RNA (Gene Activity) Assay
-# Note: Must use 'kidney_merged' as this is your integrated object
 DefaultAssay(kidney_merged) <- 'RNA' 
 
 # 3. Generate DotPlot
@@ -316,7 +308,6 @@ p_dot <- DotPlot(
 # 4. Display and Save Plot
 print(p_dot)
 
-# Save the plot for manual annotation reference
 ggsave("Kidney_Annotation_DotPlot.png", plot = p_dot, width = 14, height = 6)
 
 print("DotPlot generated! Please check the image to start manual annotation.")
@@ -369,7 +360,6 @@ write.csv(all_markers, file = output_csv, row.names = FALSE)
 print(paste("All Markers have been calculated and saved to:", output_csv))
 print("= Tip: Open this CSV in Excel, filter for p_val_adj < 0.05, and cross-reference with databases like CellMarker.")
 
-# Create a mapping vector from cluster IDs to annotated cell types
 new.cluster.ids <- c(
   "0"  = "PCT",
   "1"  = "PCT",
@@ -415,7 +405,6 @@ kidney_merged <- RenameIdents(kidney_merged, new.cluster.ids)
 # [Key step] Save the annotated cell type labels into metadata as "cell_type"
 kidney_merged$cell_type <- Idents(kidney_merged)
 
-# Plot a UMAP with the new labels for a quick sanity check
 p_annotated <- DimPlot(
   kidney_merged,
   reduction = "umap",
@@ -434,7 +423,6 @@ ggsave(
 )
 
 ## Split Fragment Files by Cell Type
-# Now we have the 'cell_type' column, so we can safely split the fragment files.
 
 output_dir <- file.path(base_dir, "fragment_files_split_by_celltype")
 if (!dir.exists(output_dir)) {
@@ -443,10 +431,8 @@ if (!dir.exists(output_dir)) {
 
 print(paste("Start splitting fragment files by cell type into:", output_dir))
 
-# Make sure we are using the peaks assay fragments
 DefaultAssay(kidney_merged) <- "peaks"
 
-# Run fragment splitting
 SplitFragments(
   object = kidney_merged,
   assay = "peaks",

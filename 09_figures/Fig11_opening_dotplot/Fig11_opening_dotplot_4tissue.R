@@ -86,9 +86,8 @@ discover.units <- function(cfg) {
 ## Read one HOMER knownResults.txt
 read.homer <- function(f, top_n = NULL) {
   if (!file.exists(f)) return(NULL)
-  t <- tryCatch(read.csv(f, sep = "\t", header = TRUE, stringsAsFactors = FALSE),
-                error = function(e) NULL)
-  if (is.null(t) || nrow(t) == 0) return(NULL)
+  t <- read.csv(f, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+  if (nrow(t) == 0) return(NULL)
   rownames(t) <- make.unique(t$Motif.Name)
   if (!is.null(top_n)) t <- t[seq_len(min(top_n, nrow(t))), ]
   t
