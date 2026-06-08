@@ -8,9 +8,8 @@ OUT_DIR   <- "/QRISdata/Q8448/Mouse_disease_data/QC_figures"
 CACHE_DIR <- file.path(OUT_DIR, "umap_cache")
 dir.create(CACHE_DIR, showWarnings = FALSE, recursive = TRUE)
 
-# Updated RDS path: new object processed by Tcell_scATAC.R
-# Cell type annotations are already stored in the 'cell_type' metadata column
-# UMAP is based on Harmony-corrected LSI (not WNN, not raw LSI)
+# Reads the final annotated T-cell object; cell types are in the cell_type column.
+# UMAP is on Harmony-corrected LSI.
 TCELLS_RDS <- "/QRISdata/Q8448/Mouse_disease_data/Tcells/tcells_final_annotated.rds"
 
 ## Load T cell object

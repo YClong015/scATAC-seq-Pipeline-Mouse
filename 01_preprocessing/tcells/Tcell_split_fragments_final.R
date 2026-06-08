@@ -1,9 +1,6 @@
 #!/usr/bin/env Rscript
-# Split T-cell fragments by the final (Masopust-2026) annotation, so the
-# per-cell-type peak counts (Fig 7) reflect the re-annotated cell types.
-# Input : tcells_final_annotated.rds  (column `cell_type_final`, 8 classes)
-# Output: fragment_files_split_by_celltype_final/  (one BED per cell type)
-#         fragment_files_split_by_celltype_final/DataList.txt  (for the SLURM array)
+# Split T-cell fragments by the final (Masopust) annotation for per-cell-type peak counts.
+# Input tcells_final_annotated.rds; output split BEDs + DataList.txt.
 
 suppressPackageStartupMessages({
   library(Signac)

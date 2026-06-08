@@ -4,9 +4,8 @@ library(ComplexHeatmap)
 library(circlize)
 library(grid)
 
-# Integrated 4-tissue HOMER heatmaps, Cell Metabolism panel E/H style:
-# column split titles at bottom, left-side AP-1 / CTCF row group labels,
-# fixed motif row order, no row clustering.
+# Integrated 4-tissue HOMER heatmaps: bottom column-split titles, left AP-1/CTCF
+# row-group labels, fixed motif order, no row clustering.
 
 ## Paths
 motif.file <- "/QRISdata/Q8448/Mouse_disease_data/DAR/Heatmap_ralph/motif_names.txt"

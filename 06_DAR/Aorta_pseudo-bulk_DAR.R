@@ -11,9 +11,7 @@ suppressPackageStartupMessages({
 })
 
 ## Paths
-# Per-tissue universal-peak Seurat object (output of 05_universal_assays/aorta/).
-# This is the OLD universal-peak version (Aorta_integrated_universal.rds),
-# NOT the v5 figure-only object.
+# Per-tissue universal-peak object (OLD Aorta_integrated_universal.rds, not the v5 figure obj).
 obj_rds_path     <- "/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_integrated_universal.rds"
 datesting_r_path <- "/home/s4869245/scripts/DAR/DATesting.R"
 

@@ -6,9 +6,7 @@ library(dplyr)
 library(tidyr)
 library(patchwork)
 
-# -- Paths --------------------------------------------------
-# Two separate Fisher overlap tables (one per tissue), produced by the
-# 03a / 03b overlap pipelines. They are merged in-script.
+# Paths: two per-tissue Fisher overlap tables (from 03a/03b), merged in-script.
 IN_KIDNEY <- "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_science_comparison/results_Kidney_5movs21mo/overlap_stats.csv"
 IN_LUNG   <- "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_science_comparison/results_Lung_5movs21mo/overlap_stats.csv"
 OUT_DIR   <- "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_science_comparison/Fig14_output"
@@ -71,9 +69,7 @@ make_panel <- function(tis, panel_letter = NULL) {
     filter(tissue == tis) %>%
     mutate(cell_type = factor(cell_type, levels = KEEP[[tis]]))
 
-  # When saved standalone, no panel_letter is shown (clean single-tissue
-  # figure). When stitched into the combined 2-panel layout, the letter
-  # is inlined with the title (A   Kidney / B   Lung).
+  # Standalone: no panel letter. Combined layout: letter inlined with the title.
   title_str <- if (is.null(panel_letter)) tis
                else paste0(panel_letter, "   ", tis)
 
@@ -124,9 +120,7 @@ make_panel <- function(tis, panel_letter = NULL) {
       axis.line         = element_blank(),
       axis.ticks        = element_line(colour = "black", linewidth = 0.8),
       axis.ticks.length = unit(5, "pt"),     # outward (Nature style)
-      # Horizontal-only major grid (helps reading OR magnitudes off
-      # the y-axis). Vertical grid is omitted because the x-axis is
-      # categorical (cell types).
+      # Horizontal-only major grid (x-axis is categorical cell types).
       panel.grid.major.y = element_line(colour = "grey90", linewidth = 0.4),
       panel.grid.major.x = element_blank(),
       panel.grid.minor   = element_blank(),

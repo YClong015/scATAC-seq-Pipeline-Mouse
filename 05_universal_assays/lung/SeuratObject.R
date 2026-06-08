@@ -1,14 +1,6 @@
 #!/usr/bin/env Rscript
-# Generic per-tissue universal-peak re-quantification script.
-# Reads any per-tissue Seurat .rds with a `peaks` assay, re-quantifies cells
-# against a supplied universal peak BED, writes a new object with a
-# `peaks_universal` assay.
-#
-# Used by:
-#   05_universal_assays/lung/SeuratObject.slurm  (Lung-specific arguments)
-#
-# Tissue-specific barcode-cleaning logic is embedded in clean_barcodes().
-# The Kidney / Aorta / Tcell sibling scripts have different clean_barcodes().
+# Generic per-tissue universal-peak re-quantification (rds + universal BED -> peaks_universal).
+# Tissue-specific barcode cleaning is in clean_barcodes(); arguments come from the .slurm.
 
 suppressPackageStartupMessages({
   library(Signac)

@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
-# Run ONCE: link fragment files to the peaks_universal assay, save per-tissue
-# {Tissue}_ready.rds for CoveragePlot. Cell -> fragment mapping differs by tissue
-# (Kidney SRR prefix, Lung BGI run id, Aorta merge suffix, Tcells single file).
+# Run ONCE: link fragments to peaks_universal, save {Tissue}_ready.rds for CoveragePlot.
+# Cell -> fragment mapping differs by tissue (Kidney SRR, Lung BGI id, Aorta suffix, Tcells single).
 
 library(Signac)
 library(Seurat)

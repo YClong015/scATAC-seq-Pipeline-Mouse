@@ -1,7 +1,5 @@
-# Kidney scATAC-seq Workflow (H5 Optimized Version)
-# Paper: Muto et al. (Science Advances 2024)
-# Input: .h5 matrix + .tsv.gz fragments
-# Samples: 8 Samples (40 excluded)
+# Kidney scATAC-seq preprocessing (Muto et al. 2024, Sci Adv).
+# Input: .h5 matrix + fragments, 8 samples.
 
 library(Signac)
 library(Seurat)
@@ -334,10 +332,7 @@ print("=
 DefaultAssay(kidney_merged) <- "RNA"
 Idents(kidney_merged) <- "seurat_clusters"
 
-# 2. Core function: Find Markers for all Clusters
-# only.pos = TRUE: Only find upregulated (highly expressed) genes
-# min.pct = 0.25: Gene must be expressed in at least 25% of cells
-# logfc.threshold = 0.25: Log fold-change threshold
+# FindAllMarkers per cluster (upregulated genes, min.pct 0.25, logfc 0.25)
 all_markers <- FindAllMarkers(
   object = kidney_merged,
   only.pos = TRUE,

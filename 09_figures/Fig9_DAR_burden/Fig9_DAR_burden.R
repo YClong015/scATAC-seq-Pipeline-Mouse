@@ -1,8 +1,6 @@
 #!/usr/bin/env Rscript
-# Fig 9. DAR burden across all four disease tissues
-# Diverging bar chart per tissue: opening DARs up (red), closing DARs down (blue).
-# Counts recomputed from DESeq2_all.tsv (padj < 0.05), the single source of truth
-# (identical thresholds to HOMER + the cell-identity barplot).
+# Fig 9 - DAR burden per tissue: diverging bars (opening up/red, closing down/blue).
+# Counts from DESeq2_all.tsv (padj < 0.05).
 
 library(dplyr)
 library(ggplot2)

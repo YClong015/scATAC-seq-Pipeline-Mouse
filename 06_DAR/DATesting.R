@@ -1,6 +1,5 @@
-### Function for perforing differential accessibility testing
-### groups cells to create pseduo-bulk replicates.
-### DA testing performed on pseudo-bulk replicates using DESeq2
+### Differential accessibility testing: group cells into pseudo-bulk replicates,
+### then test with DESeq2.
 apply_DESeq2_test_seurat <- function(seurat.object, 
                                      population.1 = NULL, 
                                      population.2 = NULL, 
@@ -135,7 +134,6 @@ apply_DESeq2_test_seurat <- function(seurat.object,
   } 
 
 }
-
 
 
 GetExpressedPeaks <- function(seurat.object, population.1, population.2=NULL, threshold=0.05, assay.use = "ATAC") {

@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 # Combine the NS + Stable integrated HOMER heatmap PNGs side by side into Fig 10.
-# Reads the two PNGs written by Fig10_integrate_heatmap.R.
-# Override the directory with HEATMAP_DIR if running on a local copy.
+# Reads the two PNGs from Fig10_integrate_heatmap.R (override dir with HEATMAP_DIR).
 
 library(magick)
 

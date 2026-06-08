@@ -1,11 +1,8 @@
 library(Seurat)
 library(Signac)
 
-## Lung is re-quantified against the universal peak set in SeuratObject.R but comes out
-## with 14 extra peak features (667,473 vs the 667,459 in Kidney/Aorta/Tcells), an
-## artefact of the chromosome-set difference between the source fragment files. Prune
-## Lung's feature space to exactly match the Kidney reference so all four objects are
-## peak-aligned for downstream merging and comparison.
+## Lung re-quantification yields 14 extra peaks (667,473 vs 667,459) from a chromosome-set
+## difference; prune to the Kidney reference so all four objects are peak-aligned.
 
 ref_rds  <- "/QRISdata/Q8448/Mouse_disease_data/Kidney/kidney_merged_universal.rds"
 lung_rds <- "/QRISdata/Q8448/Mouse_disease_data/Lung/lung_universal.rds"

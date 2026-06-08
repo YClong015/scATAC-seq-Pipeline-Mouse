@@ -67,9 +67,8 @@ pub.theme <- theme_classic(base_size = 11) +
     plot.margin      = margin(6, 8, 6, 6)
   )
 
-# Extract UMAP coordinates
-# cell_type in Panel C comes from the per-tissue lookup (not the integrated
-# object), so annotations match Fig5_UMAP_annotation.R exactly.
+# Extract UMAP coordinates; cell_type comes from the per-tissue lookup so Panel C
+# matches Fig5_UMAP_annotation.R.
 get.umap.df <- function(obj, reduction) {
   emb <- Embeddings(obj, reduction = reduction)
   df  <- as.data.frame(emb)

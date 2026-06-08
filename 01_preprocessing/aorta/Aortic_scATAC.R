@@ -14,9 +14,8 @@ library(BiocParallel)
 SEED <- 1234L
 set.seed(SEED)
 
-# scDblFinder reproducibility:
-# - For serial processing: use SerialParam(RNGseed=SEED)
-# - This forces deterministic RNG inside scDblFinder when BiocParallel is used.
+# scDblFinder reproducibility: SerialParam(RNGseed=SEED) forces deterministic RNG
+# under BiocParallel.
 bp <- SerialParam(RNGseed = SEED)
 
 ## Annotation (mm10)

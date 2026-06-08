@@ -1,8 +1,6 @@
 #!/usr/bin/env Rscript
-# Fig 11 - Top enriched TF motifs in opening DARs across the four disease tissues
-# One dotplot per tissue (A Kidney, B Lung, C Aorta, D T cells): x = cell type,
-# y = top-N motifs, bubble size = % targets, colour = -log10(P), NS background.
-# From HOMER knownResults.txt; outputs Fig11_opening_solo_{tissue} + _combined.
+# Fig 11 - Top opening-DAR TF motifs (NS background), one dotplot per tissue.
+# x = cell type, y = top-N motifs, size = % targets, colour = -log10(P).
 
 library(ggplot2)
 library(dplyr)
@@ -45,9 +43,8 @@ TISSUES <- list(
     title       = "T cells",
     homer_root  = "/QRISdata/Q8448/Mouse_disease_data/DAR/DAR_pseudobulk_DESeq2/DAR_pseudobulk_Tcells_DESeq2/HOMER_NS_bg",
     open_pat    = "__005__opening_vs_NS$",
-    # Each condition vs the Young_control baseline, so every column is one
-    # age/treatment GROUP measured against the same reference.
-    # (Juvenile dropped: not relevant to the age-related disease question.)
+    # Each condition vs the Young_control baseline (one column per group).
+    # Juvenile dropped (not relevant to age-related disease).
     keep_contrast = c("Young_acute_vs_Young_control",
                       "Young_chronic_vs_Young_control",
                       "Aged_vs_Young_control"),

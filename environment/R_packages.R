@@ -1,5 +1,4 @@
-# R package installation script for scATAC-ageing-disease-mouse
-# Tested with R 4.4.2
+# R package installation for scATAC-ageing-disease-mouse (tested with R 4.4.2).
 # Run: Rscript environment/R_packages.R
 
 ### CRAN packages ###

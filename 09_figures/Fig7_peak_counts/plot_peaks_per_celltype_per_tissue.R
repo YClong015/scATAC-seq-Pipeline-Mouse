@@ -8,8 +8,7 @@ library(scales)
 library(patchwork)   # for the 2x2 combined panel
 
 ## Paths
-# Pooled-T-cell version: read + write under peaks_per_celltype_pooled/,
-# leaving the original peaks_per_celltype/ (per-subtype version) untouched.
+# Pooled-T-cell version: read/write under peaks_per_celltype_pooled/.
 IN_DIR  <- ifelse(
   dir.exists("/QRISdata/Q8448/Mouse_disease_data/QC_figures/peaks_per_celltype_pooled"),
   "/QRISdata/Q8448/Mouse_disease_data/QC_figures/peaks_per_celltype_pooled",
@@ -210,9 +209,7 @@ if (length(plot.list) >= 1) {
 
   combined <- wrap_plots(tagged.list, ncol = 2)
 
-  # Larger canvas: 26 x 18 in. (~66 x 46 cm); landscape-A3-friendly,
-  # designed so each of the 4 panels retains thesis-readable fonts
-  # after the latest font bump (axis 18-20pt, title 26pt).
+  # Larger canvas (26 x 18 in, landscape-A3) so the 4 panels stay readable.
   cw <- 26
   ch <- 18
 
