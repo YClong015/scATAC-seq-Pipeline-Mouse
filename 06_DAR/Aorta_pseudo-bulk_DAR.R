@@ -1,9 +1,7 @@
 #!/usr/bin/env Rscript
 
-# ============================================================
 # Aorta pseudo-bulk DAR pipeline (DESeq2 via DATesting.R)
-# Per-tissue object input — same template as Lung / Kidney / Tcells.
-# ============================================================
+# Per-tissue object input - same template as Lung / Kidney / Tcells.
 
 suppressPackageStartupMessages({
   library(Seurat)
@@ -12,9 +10,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
-# -----------------------------
-# 0) Paths
-# -----------------------------
+## Paths
 # Per-tissue universal-peak Seurat object (output of 05_universal_assays/aorta/).
 # This is the OLD universal-peak version (Aorta_integrated_universal.rds),
 # NOT the v5 figure-only object.
@@ -28,9 +24,7 @@ dir.create(file.path(out_dir, "DAR_BED"),   showWarnings = FALSE)
 dir.create(file.path(out_dir, "QC"),        showWarnings = FALSE)
 dir.create(file.path(out_dir, "Figures"),   showWarnings = FALSE)
 
-# -----------------------------
-# 1) Parameters
-# -----------------------------
+## Parameters
 assay_name          <- "peaks_universal"
 group_col           <- "Group"             # Aorta uses "Group" metadata column
 celltype_col        <- "cell_type"
@@ -43,9 +37,7 @@ num_splits          <- 10
 padj_cutoff         <- 0.05
 min_cells_per_group <- 80
 
-# -----------------------------
-# 2) Helpers
-# -----------------------------
+## Helpers
 sanitize_name <- function(x) gsub("[^A-Za-z0-9_\\-]+", "_", x)
 
 peak_to_bed <- function(peaks, out_file) {
@@ -67,9 +59,7 @@ safe_hist <- function(x, title_txt, out_png) {
   dev.off()
 }
 
-# -----------------------------
-# 3) Load DATesting.R + object
-# -----------------------------
+## Load DATesting.R + object
 if (!file.exists(datesting_r_path)) stop("DATesting.R not found: ", datesting_r_path)
 source(datesting_r_path)
 stopifnot(exists("apply_DESeq2_test_seurat"), exists("GetExpressedPeaks"))
@@ -90,9 +80,7 @@ if (!celltype_col %in% colnames(obj[[]]))
 
 DefaultAssay(obj) <- assay_name
 
-# -----------------------------
-# 4) Group + cell type mapping
-# -----------------------------
+## Group + cell type mapping
 obj$dar_group     <- as.character(obj[[group_col]][, 1])
 obj$cell_type_dar <- as.character(obj[[celltype_col]][, 1])
 
@@ -126,17 +114,12 @@ message("\nEligible (>= ", min_cells_per_group, " cells/group): ",
 if (length(skipped) > 0)
   message("Skipped (too few cells): ", paste(skipped, collapse = ", "))
 
-# -----------------------------
-# 5) Pseudo-bulk DAR loop
-# -----------------------------
+## Pseudo-bulk DAR loop
 all_summary <- list()
 Idents(obj)  <- "dar_group"
 
 for (ct in eligible_celltypes) {
-  message("\n========================================")
   message("Processing: ", ct)
-  message("========================================")
-
   ct_obj <- subset(obj, subset = cell_type_dar == ct)
   DefaultAssay(ct_obj) <- assay_name
   Idents(ct_obj) <- "dar_group"
@@ -237,9 +220,7 @@ for (ct in eligible_celltypes) {
   rm(ct_obj); gc()
 }
 
-# -----------------------------
-# 6) Summary + plots
-# -----------------------------
+## Summary + plots
 if (length(all_summary) == 0) stop("No DAR results generated.")
 
 summary_df <- bind_rows(all_summary)

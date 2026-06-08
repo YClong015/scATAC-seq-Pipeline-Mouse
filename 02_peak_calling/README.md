@@ -1,4 +1,4 @@
-# Stage 02 — Per-cell-type peak calling (MACS2 via pycisTopic)
+# Stage 02 - Per-cell-type peak calling (MACS2 via pycisTopic)
 
 After `SplitFragments()` produces one BED per cell type, MACS2 is run on each BED to call narrow peaks. We use the pycisTopic `peak_calling()` wrapper for consistent BEDPE-friendly defaults.
 
@@ -16,22 +16,22 @@ After `SplitFragments()` produces one BED per cell type, MACS2 is run on each BE
 ## Run order
 
 ```bash
-# Kidney — 12 cell types, BEDPE input
-sbatch 02_peak_calling/kidney/peak_kidney.slurm   # SLURM array 1-12
+# Kidney - 12 cell types, BEDPE input
+(cd 02_peak_calling/kidney && sbatch peak_kidney.slurm)   # SLURM array 1-12
 
 # OR per-sample 9-SRR variants (one peak set per SRR, used for sample-level QC):
 for srr in SRR27367330 SRR27367331 SRR27367332 SRR27367340 SRR27367344 SRR27367346 SRR27367347 SRR27367349 SRR27367351; do
-  python 02_peak_calling/kidney/per_sample/$srr/peak_calling.py
+  python 02_peak_calling/kidney/per_sample/peak_calling.py $srr
 done
 
-# Lung — 15 cell types
-sbatch 02_peak_calling/lung/peak_calling_for_lung.slurm   # SLURM array 1-15
+# Lung - 15 cell types
+(cd 02_peak_calling/lung && sbatch peak_calling_for_lung.slurm)   # SLURM array 1-15
 
-# Aorta — 6 cell types
-sbatch 02_peak_calling/aorta/peak_calling_for_aortic.slurm   # SLURM array 1-6
+# Aorta - 6 cell types
+(cd 02_peak_calling/aorta && sbatch peak_calling_for_aortic.slurm)   # SLURM array 1-6
 
-# T cells — 9 cell types
-sbatch 02_peak_calling/tcells/peak_Tcell.slurm   # SLURM array 1-9
+# T cells - 9 cell types
+(cd 02_peak_calling/tcells && sbatch peak_Tcell.slurm)   # SLURM array 1-9
 ```
 
 Each script reads a `DataList.txt` listing the per-cell-type BED filenames and dispatches one MACS2 job per file via the SLURM `--array` directive.

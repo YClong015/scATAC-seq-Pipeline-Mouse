@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=256G
-#SBATCH --job-name=dnbc4tools_942_L01  
+#SBATCH --job-name=dnbc4tools_942_L01
 #SBATCH --time=24:00:00
 #SBATCH --partition=general
 #SBATCH --account=a_nefzger
@@ -11,20 +11,13 @@
 #SBATCH --error=MGI_%j.err
 #SBATCH --array=1-1
 
-# ==========================================
-# 1. 先激活 dnbc4tools 自带环境 (为了 Python, MACS2 等)
-# ==========================================
+# Activate the dnbc4tools environment (provides Python, MACS2, BWA, samtools)
 source /scratch/user/s4869245/dnbc4tools/dnbc4tools3.0/sourceC4.bash
 
-# ==========================================
-# 3. 环境自检 (这一步非常重要，用来排查隐患)
-# ==========================================
-echo "--- Environment Check ---"
-echo "BWA path: $(which bwa)"
-echo "Samtools path: $(which samtools)"
-echo "MACS2 path: $(which macs2)"  # 检查一下找峰软件在不在
-echo "Python path: $(which python)"
-echo "-------------------------"
+echo "BWA: $(which bwa)"
+echo "Samtools: $(which samtools)"
+echo "MACS2: $(which macs2)"
+echo "Python: $(which python)"
 
 
 DATA=Lung
@@ -42,7 +35,7 @@ mkdir -p $OUTPUT_DIR
 
 cd $TMPDIR
 
-# --- Data Preparation ---
+## Data Preparation
 cp ${SOURCE_DIR}/${FQ_R1} ${TMPDIR}/${SAMPLE}_R1.fastq.gz
 cp ${SOURCE_DIR}/${FQ_R2} ${TMPDIR}/${SAMPLE}_R2.fastq.gz
 
@@ -51,7 +44,7 @@ if [ -d "${TMPDIR}/${SAMPLE}" ]; then
     rm -rf ${TMPDIR}/${SAMPLE}
 fi
 
-# --- Core Analysis ---
+## Core Analysis
 echo "Starting dnbc4tools atac run for sample ${SAMPLE} at $(date)"
 $DNBC4TOOLS_EXE atac run \
         --name ${SAMPLE} \
@@ -60,7 +53,7 @@ $DNBC4TOOLS_EXE atac run \
         --genomeDir ${GENOME_REF_DIR} \
         --threads 32 \
 	--customize "cb,R2:51-60;cb,R2:63-72;R1,R1:1-50;R2,R2:1-50"
-# --- Packaging ---
+## Packaging
 echo "Packaging results for sample ${SAMPLE} at $(date)"
 tar -zcvf $TMPDIR/${SAMPLE}.tar.gz ${TMPDIR}/${SAMPLE}
 cp ${TMPDIR}/${SAMPLE}.tar.gz ${OUTPUT_DIR}/${DATA}_${SAMPLE}.tar.gz

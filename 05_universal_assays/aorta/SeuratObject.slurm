@@ -31,7 +31,6 @@ SCRIPT="./SeuratObject.R"
 
 echo "Starting Rscript..."
 
-# < [CRITICAL FIX] Removed the trailing backslash, and made sure --frag_tpl is passed!
 Rscript "${SCRIPT}" \
   --obj "${OBJ}" \
   --objtype rds \

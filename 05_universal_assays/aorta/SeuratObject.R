@@ -15,7 +15,7 @@ get_arg <- function(args, key, default = NULL) {
   args[[hit + 1]]
 }
 
-# < [CRITICAL FIX] Smart Barcode Cleaner
+# Barcode cleaner
 # specifically built to handle Aorta suffixes (_1) and Lung prefixes (Control_F2_...)
 clean_barcodes <- function(x) {
   # 1. Remove Seurat Merge suffixes (e.g., AAACGAA...-1_1 -> AAACGAA...-1)
@@ -63,10 +63,7 @@ if (obj_path == "" || up_bed == "" || out_rds == "") {
   stop("Need --obj --up --out")
 }
 
-msg("===============================================")
 msg("Step 1: Load object")
-msg("===============================================")
-
 if (obj_type == "rds") {
   obj <- readRDS(obj_path)
 } else {
@@ -80,17 +77,11 @@ DefaultAssay(obj) <- assay_in
 msg(paste0("Successfully loaded: ", obj_path))
 msg(paste0("Total Cells: ", ncol(obj)))
 
-msg("===============================================")
 msg("Step 2: Load universal peaks (bed.gz)")
-msg("===============================================")
-
 peaks <- load_peaks_bed_gz(up_bed)
 msg(paste0("Universal Peaks count: ", length(peaks)))
 
-msg("===============================================")
 msg("Step 3: Build FeatureMatrix on universal peaks")
-msg("===============================================")
-
 counts_list <- list()
 
 if (mode == "per_sample") {
@@ -102,7 +93,6 @@ if (mode == "per_sample") {
   sample_ids <- sort(unique(obj[[sample_key]][, 1]))
   msg(paste0("Found ", length(sample_ids), " samples to process."))
   
-  # < [CRITICAL FIX] Properly closed the For loop and integrated the cleaner
   for (id in sample_ids) {
     frag_path <- gsub("\\{id\\}", id, frag_tpl)
     if (!file.exists(frag_path)) stop(paste0("Missing fragments file: ", frag_path))
@@ -142,10 +132,7 @@ if (length(common) == 0) stop("No overlap between original Seurat cells and newl
 # Ensure perfect order alignment
 counts <- counts[, colnames(obj), drop = FALSE]
 
-msg("===============================================")
 msg("Step 4: Add new assay and save")
-msg("===============================================")
-
 assay_u <- CreateChromatinAssay(counts = counts, genome = "mm10")
 
 obj[[assay_out]] <- assay_u

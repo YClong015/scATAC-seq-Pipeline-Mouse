@@ -1,12 +1,10 @@
 #!/usr/bin/env Rscript
 
-# ============================================================
 # Tcells pseudo-bulk DAR pipeline (DESeq2 via DATesting.R)
 # Lung-style structure:
 # - explicit group mapping from metadata column
 # - optional fragment mounting (recommended for downstream tracks)
 # - FORCED global cell type assignment to "Tcell"
-# ============================================================
 
 suppressPackageStartupMessages({
   library(Seurat)
@@ -16,9 +14,7 @@ suppressPackageStartupMessages({
   library(Matrix)
 })
 
-# -----------------------------
-# 0) User paths (EDIT if needed)
-# -----------------------------
+## User paths (EDIT if needed)
 obj_rds_path <- "/QRISdata/Q8448/Mouse_disease_data/Tcells/tcells_universal.rds"
 frag_path <- "/QRISdata/Q8448/Mouse_disease_data/Tcells/atac_fragments.tsv.gz"
 datesting_r_path <- "/home/s4869245/scripts/DAR/DATesting.R"
@@ -34,9 +30,7 @@ dir.create(file.path(out_dir, "DAR_BED"), showWarnings = FALSE)
 dir.create(file.path(out_dir, "QC"), showWarnings = FALSE)
 dir.create(file.path(out_dir, "Figures"), showWarnings = FALSE)
 
-# -----------------------------
-# 1) Parameters
-# -----------------------------
+## Parameters
 # Assay name in Tcells object (auto-detect if peaks_universal missing)
 assay_name_prefer <- "peaks_universal"
 
@@ -74,9 +68,7 @@ min_cells_per_group <- 80
 # Lung-style: optionally mount fragments onto assay (for track/footprint later)
 mount_fragments <- TRUE
 
-# -----------------------------
-# 2) Helpers
-# -----------------------------
+## Helpers
 stop_with <- function(...) stop(paste0(...), call. = FALSE)
 sanitize_name <- function(x) gsub("[^A-Za-z0-9_\\-]+", "_", x)
 
@@ -116,9 +108,7 @@ make_raw_barcodes <- function(cell_names) {
   x
 }
 
-# -----------------------------
-# 3) Load helper methods + object
-# -----------------------------
+## Load helper methods + object
 if (!file.exists(datesting_r_path)) {
   stop_with("DATesting.R not found: ", datesting_r_path)
 }
@@ -150,9 +140,7 @@ if (!group_col %in% colnames(obj[[]])) {
   stop_with("Missing group column: ", group_col)
 }
 
-# -----------------------------
-# 4) Group mapping & Global Cell Type Assignment
-# -----------------------------
+## Group mapping & Global Cell Type Assignment
 obj$dar_group <- as.character(obj[[group_col]][, 1])
 
 # Assign all cells as "Tcell" uniformly
@@ -187,9 +175,7 @@ write.csv(
 
 message("After filtering: cells = ", ncol(obj))
 
-# -----------------------------
-# 5) Optional: mount fragments 
-# -----------------------------
+## Optional: mount fragments
 if (mount_fragments) {
   if (!file.exists(frag_path)) stop_with("Fragment file missing: ", frag_path)
   
@@ -218,9 +204,7 @@ if (mount_fragments) {
   message("Saved: ", file.path(out_dir, "tcells_with_fragments.rds"))
 }
 
-# -----------------------------
-# 6) Pseudo-bulk DAR loop
-# -----------------------------
+## Pseudo-bulk DAR loop
 DefaultAssay(obj) <- assay_name
 eligible_celltypes <- sort(unique(obj$cell_type_dar))
 message("Cell types: ", paste(eligible_celltypes, collapse = ", "))
@@ -228,10 +212,7 @@ message("Cell types: ", paste(eligible_celltypes, collapse = ", "))
 all_summary <- list()
 
 for (ct in eligible_celltypes) {
-  message("\n========================================")
   message("Processing cell type: ", ct)
-  message("========================================")
-  
   ct_obj <- subset(obj, subset = cell_type_dar == ct)
   DefaultAssay(ct_obj) <- assay_name
   Idents(ct_obj) <- "dar_group"
@@ -356,7 +337,6 @@ write.csv(summary_df,
 message("Done. Output folder: ", out_dir)
 
 # 8) Save summaries + plots
-# -----------------------------
 if (length(all_summary) == 0) stop_with("No pseudo-bulk DAR results were generated.")
 
 summary_df <- bind_rows(all_summary)
@@ -368,7 +348,7 @@ plot_df <- bind_rows(
 )
 write.csv(plot_df, file.path(out_dir, "DAR_pseudobulk_summary_Tcells_long.csv"), row.names = FALSE)
 
-# --- 1. Bar plot ---
+## Bar plot
 p_counts <- ggplot(plot_df, aes(x = cell_type, y = n_DAR, fill = direction)) +
   geom_col(position = "dodge") +
   facet_wrap(~ contrast, nrow = 3, scales = "free_y") +
@@ -388,7 +368,7 @@ p_counts <- ggplot(plot_df, aes(x = cell_type, y = n_DAR, fill = direction)) +
 ggsave(file.path(out_dir, "Figures", "Tcells_pseudobulk_DAR_counts_barplot.pdf"), p_counts, width = 14, height = 6)
 ggsave(file.path(out_dir, "Figures", "Tcells_pseudobulk_DAR_counts_barplot.png"), p_counts, width = 14, height = 6, dpi = 300)
 
-# --- 2. Tile plot (Heatmap) ---
+## Tile plot (Heatmap)
 plot_df$n_DAR_signed <- ifelse(plot_df$direction == "Closing", -plot_df$n_DAR, plot_df$n_DAR)
 
 p_tile <- ggplot(plot_df, aes(x = contrast, y = cell_type, fill = n_DAR_signed)) +

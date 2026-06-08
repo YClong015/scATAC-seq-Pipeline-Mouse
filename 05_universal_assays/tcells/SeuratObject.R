@@ -60,10 +60,7 @@ load_peaks_bed_gz <- function(path) {
   gr
 }
 
-# ==============================================================================
-# Main Execution Logic
-# ==============================================================================
-
+## main execution
 args <- commandArgs(trailingOnly = TRUE)
 
 # Parse arguments
@@ -83,10 +80,7 @@ if (obj_path == "" || up_bed == "" || out_rds == "") {
   stop("Error: Missing required arguments: --obj, --up, or --out")
 }
 
-msg("===============================================")
 msg("Step 1: Load Seurat Object")
-msg("===============================================")
-
 if (obj_type == "rds") {
   obj <- readRDS(obj_path)
 } else {
@@ -108,17 +102,11 @@ if (!sample_key %in% colnames(obj@meta.data)) {
     stop(paste0("Error: The sample_key '", sample_key, "' was not found in the object metadata!"))
 }
 
-msg("===============================================")
 msg("Step 2: Load Universal Peaks (BED)")
-msg("===============================================")
-
 peaks <- load_peaks_bed_gz(up_bed)
 msg(paste0("Loaded universal peaks: ", length(peaks)))
 
-msg("===============================================")
 msg("Step 3: Build FeatureMatrix (Quantification)")
-msg("===============================================")
-
 counts_list <- list()
 
 if (mode == "per_sample") {
@@ -162,7 +150,7 @@ if (mode == "per_sample") {
       next
     }
 
-    # === CRITICAL FIX: Restore original Seurat cell names ===
+    ## restore original Seurat cell names
     # This ensures that the new matrix matches the existing object exactly
     if (ncol(mat) == length(cells_pref)) {
         colnames(mat) <- cells_pref
@@ -194,10 +182,7 @@ if (length(common) == 0) stop("FATAL: No overlap between object cells and calcul
 obj <- subset(obj, cells = common)
 counts <- counts[, common, drop = FALSE]
 
-msg("===============================================")
 msg("Step 4: Create Assay and Save")
-msg("===============================================")
-
 # Try to copy annotations from the old assay
 old_annotations <- Annotation(obj[[assay_in]])
 

@@ -17,12 +17,10 @@ source "$EBROOTANACONDA3/etc/profile.d/conda.sh"
 conda activate scenicplus
 
 BASE="/QRISdata/Q8448/Mouse_disease_data"
-SCRIPT="/home/s4869245/scripts/peak_merging/consensus_mm10.py"
+SCRIPT="${SLURM_SUBMIT_DIR}/consensus_mm10.py"
 
 export PEAK_HALF_WIDTH="250"
 export BLACKLIST="/scratch/user/s4869245/pycisTopic/blacklist/mm10-blacklist.v2.bed"
-
-# Strongly recommended: local chrom sizes (avoid internet dependency)
 export CHROMSIZES_FILE="/scratch/user/s4869245/mouse_mm10_ref/chrom.sizes"
 
 PY="$HOME/.conda/envs/scenicplus/bin/python"
@@ -30,9 +28,7 @@ PY="$HOME/.conda/envs/scenicplus/bin/python"
 TISSUES=("Kidney" "Aorta" "Tcells" "Lung")
 
 for TIS in "${TISSUES[@]}"; do
-  echo "==============================================="
   echo "Tissue: ${TIS}"
-  echo "==============================================="
 
   IN_ROOT="${BASE}/${TIS}/peaks"
   OUT_ROOT="${BASE}/${TIS}/peak_merging"

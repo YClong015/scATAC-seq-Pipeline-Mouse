@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 # Generic per-tissue universal-peak re-quantification script.
-# Same logic as the Lung SeuratObject.R in master_project_scripts/integration_analysis/Lung_seurat_obj/.
 # Reads any per-tissue Seurat .rds with a `peaks` assay, re-quantifies cells
 # against a supplied universal peak BED, writes a new object with a
 # `peaks_universal` assay.

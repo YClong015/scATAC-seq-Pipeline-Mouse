@@ -1,6 +1,6 @@
-# Cell Ranger ATAC (Kidney + Aorta only — NOT Lung)
+# Cell Ranger ATAC (Kidney + Aorta only - NOT Lung)
 
-Lung uses MGI/dnbc4tools instead — see `01_preprocessing/lung/dnbc4tools_per_sample/Run_MGI_*.slurm`.
+Lung uses MGI/dnbc4tools instead - see `01_preprocessing/lung/dnbc4tools_per_sample/Run_MGI_*.slurm`.
 
 Lung does NOT need Cell Ranger.
 
@@ -22,7 +22,7 @@ FASTQ_DIR="${DATA_ROOT}/Kidney/SRR27367347_Fastq/SRR27367347"
 OUT_DIR="${DATA_ROOT}/Kidney/cellranger_unpacked_data/${SAMPLE}"
 REF="/scratch/user/${USER}/cellranger_ref/refdata-cellranger-arc-mm10-2020-A-2.0.0"
 
-module load cellranger-atac/2.1.0
+module load cellranger-atac/2.0.0
 mkdir -p "${OUT_DIR}" && cd "${OUT_DIR}"
 
 cellranger-atac count \

@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=256G
-#SBATCH --job-name=dnbc4tools_942_L02  #
+#SBATCH --job-name=dnbc4tools_942_L02
 #SBATCH --time=24:00:00
 #SBATCH --partition=general
 #SBATCH --account=a_nefzger
@@ -27,11 +27,11 @@ mkdir -p $OUTPUT_DIR
 
 cd $TMPDIR
 
-# --- Data Preparation ---
+## Data Preparation
 cp ${SOURCE_DIR}/${FQ_R1} ${TMPDIR}/${SAMPLE}_R1.fastq.gz
 cp ${SOURCE_DIR}/${FQ_R2} ${TMPDIR}/${SAMPLE}_R2.fastq.gz
 
-# --- Core Analysis ---
+## Core Analysis
 echo "Starting dnbc4tools atac run for sample ${SAMPLE} at $(date)"
 $DNBC4TOOLS_EXE atac run \
         --name ${SAMPLE} \
@@ -41,7 +41,7 @@ $DNBC4TOOLS_EXE atac run \
         --threads 32 \
 	--customize CUSTOMIZE_STR
 
-# --- Packaging ---
+## Packaging
 echo "Packaging results for sample ${SAMPLE} at $(date)"
 tar -zcvf $TMPDIR/${SAMPLE}.tar.gz ${TMPDIR}/${SAMPLE}
 cp ${TMPDIR}/${SAMPLE}.tar.gz ${OUTPUT_DIR}/${DATA}_${SAMPLE}.tar.gz

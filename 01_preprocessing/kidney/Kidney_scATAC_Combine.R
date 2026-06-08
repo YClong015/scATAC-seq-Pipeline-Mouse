@@ -1,9 +1,7 @@
-# ==============================================================================
 # Kidney scATAC-seq Workflow (H5 Optimized Version)
 # Paper: Muto et al. (Science Advances 2024)
 # Input: .h5 matrix + .tsv.gz fragments
 # Samples: 8 Samples (40 excluded)
-# ==============================================================================
 
 library(Signac)
 library(Seurat)
@@ -17,29 +15,24 @@ library(hdf5r)
 
 set.seed(1234)
 
-# ----------------------------
-# 1) Annotation Setup (mm10)
-# ----------------------------
-print("Setting up genome annotations...")
+## Annotation Setup (mm10)
 annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
 seqlevelsStyle(annotations) <- "UCSC"
 genome(annotations) <- "mm10"
 
-# ----------------------------
-# 2) Sample Info & Data Loading
-# ----------------------------
+## Sample Info & Data Loading
 base_dir <- "/QRISdata/Q8448/Mouse_disease_data/Kidney/cellranger_unpacked_data"
 
 samples <- data.frame(
   sample_id = c(
     "SRR27367347", "SRR27367344", "SRR27367332", # Sham
     "SRR27367351", "SRR27367349", "SRR27367346", # Day14
-    "SRR27367331", "SRR27367330", "SRR27367340"  # Day42 (New Sample!)
+    "SRR27367331", "SRR27367330", "SRR27367340"  # Day42
   ),
   condition = c(
     "Sham", "Sham", "Sham",
     "Day14", "Day14", "Day14",
-    "Day42", "Day42", "Day42" # °7,/ Day42
+    "Day42", "Day42", "Day42"
   ),
   group = c(
     "Control", "Control", "Control",
@@ -102,10 +95,7 @@ for (i in 1:nrow(samples)) {
   cur_obj$condition <- samples$condition[i]
   cur_obj$group <- samples$group[i]
   
-  # ----------------------------
-  # 3) QC Calculation
-  # ----------------------------
-  # print(paste("  - Calculating QC..."))
+  ## QC Calculation
   cur_obj <- NucleosomeSignal(cur_obj)
   cur_obj <- TSSEnrichment(cur_obj, fast = FALSE)
   
@@ -124,18 +114,14 @@ for (i in 1:nrow(samples)) {
     cur_obj$blacklist_ratio <- 0 
   }
   
-  # ----------------------------
-  # 4) Doublet Finding
-  # ----------------------------
+  ## Doublet Finding
   # print(paste("  - scDblFinder..."))
   mtx <- GetAssayData(cur_obj, layer = "counts")
   dbl_results <- suppressMessages(scDblFinder(mtx, verbose = FALSE))
   cur_obj$scDblFinder.class <- dbl_results$scDblFinder.class
   cur_obj$scDblFinder.score <- dbl_results$scDblFinder.score
   
-  # ----------------------------
-  # 5) Filtering (Per Paper Methods)
-  # ----------------------------
+  ## Filtering (Per Paper Methods)
   print(paste("  - Filtering", cur_id, "..."))
   print(paste("    Before:", ncol(cur_obj)))
   
@@ -154,10 +140,7 @@ for (i in 1:nrow(samples)) {
   
   obj_list[[i]] <- cur_obj
 }
-# ==============================================================================
-# STEP 1: Calculate Missing QC Metrics for ALL Samples (In Memory)
-# ==============================================================================
-
+## Calculate Missing QC Metrics for ALL Samples (In Memory)
 print("--- Updating QC Metrics for all samples in obj_list ---")
 
 # Ensure list has names
@@ -205,10 +188,7 @@ for (id in names(obj_list)) {
 print("--- All metrics calculated. Ready to view! ---")
 
 
-# ==============================================================================
-# STEP 2: Define Interactive Viewer Function
-# ==============================================================================
-
+## Define Interactive Viewer Function
 ViewQC <- function(sample_name) {
   
   # Check if sample exists
@@ -240,9 +220,7 @@ ViewQC <- function(sample_name) {
   # Force print the plot to the Viewer
   print(p)
 }
-# ----------------------------
-# 6) Merge & Harmony Integration
-# ----------------------------
+## Merge & Harmony Integration
 print("Merging all samples...")
 obj_list <- obj_list[!sapply(obj_list, is.null)]
 
@@ -254,7 +232,6 @@ kidney_merged <- merge(
 
 rm(obj_list); gc()
 
-print("Running LSI & Harmony...")
 DefaultAssay(kidney_merged) <- "peaks"
 kidney_merged <- RunTFIDF(kidney_merged)
 kidney_merged <- FindTopFeatures(kidney_merged, min.cutoff = 'q0')
@@ -270,18 +247,12 @@ kidney_merged <- RunHarmony(
   verbose = TRUE
 )
 
-# ----------------------------
-# 7) Clustering & UMAP
-# ----------------------------
-print("Running UMAP & Clustering...")
+## Clustering & UMAP
 kidney_merged <- RunUMAP(kidney_merged, reduction = "harmony", dims = 2:30, seed.use = 1234)
 kidney_merged <- FindNeighbors(kidney_merged, reduction = "harmony", dims = 2:30)
 kidney_merged <- FindClusters(kidney_merged, algorithm = 3, resolution = 0.8, verbose = FALSE, random.seed = 1234)
 
-# ----------------------------
-# 8) Visualization
-# ----------------------------
-print("Calculating Gene Activities...")
+## Visualization
 gene.activities <- GeneActivity(kidney_merged)
 kidney_merged[['RNA']] <- CreateAssayObject(counts = gene.activities)
 kidney_merged <- NormalizeData(
@@ -290,10 +261,7 @@ kidney_merged <- NormalizeData(
   normalization.method = 'LogNormalize',
   scale.factor = median(kidney_merged$nCount_RNA)
 )
-# ==============================================================================
-# STEP: Save the Integrated Object
-# ==============================================================================
-print("Saving merged object to disk...")
+## STEP: Save the Integrated Object
 
 # Define output path (modify this path if needed)
 output_file <- file.path(base_dir, "kidney_merged_harmony.rds")
@@ -312,11 +280,7 @@ print(p1 + p2)
 
 print("Workflow Complete!")
 
-# ==============================================================================
-# STEP 9: Cell Type Annotation (Marker Visualization)
-# ==============================================================================
-
-print("Generating Marker Gene DotPlot...")
+## Cell Type Annotation (Marker Visualization)
 
 # 1. Define Marker Gene List
 marker_list_clean <- list(
@@ -357,14 +321,12 @@ ggsave("Kidney_Annotation_DotPlot.png", plot = p_dot, width = 14, height = 6)
 
 print("DotPlot generated! Please check the image to start manual annotation.")
 
-# ==============================================================================
-# STEP 10: Rename Clusters Based on Marker Annotation
-# ==============================================================================
+## Rename Clusters Based on Marker Annotation
 DefaultAssay(kidney_merged) <- "RNA"
 Idents(kidney_merged) <- "seurat_clusters"
 clusters_to_check <- c("3", "6", "28")
 for (clust in clusters_to_check) {
-  print(paste("====== Cluster", clust, "Top 5 Markers ======"))
+  print(paste("Cluster", clust, "Top 5 Markers"))
   cluster_markers <- FindMarkers(kidney_merged, 
                                  ident.1 = clust, 
                                  only.pos = TRUE, 
@@ -373,10 +335,7 @@ for (clust in clusters_to_check) {
   print(top5_markers)
 }
 print("Renaming clusters to formal cell types...")
-# ==============================================================================
-# Find and export Top Markers for all Clusters (for rigorous cell annotation)
-# ==============================================================================
-
+## Find and export Top Markers for all Clusters (for rigorous cell annotation)
 print("=
  Calculating specific Marker genes for all Clusters (this may take a while)...")
 
@@ -403,12 +362,12 @@ top5_all <- all_markers %>%
 # 4. Print to console (for quick browsing)
 print(top5_all, n = 100)
 
-# 5. [CRITICAL] Save all Markers as a CSV file for manual review in Excel
+# save all markers as CSV
 output_csv <- file.path(base_dir, "All_Clusters_Top_Markers.csv")
 write.csv(all_markers, file = output_csv, row.names = FALSE)
 
 print(paste("All Markers have been calculated and saved to:", output_csv))
-print("=¡ Tip: Open this CSV in Excel, filter for p_val_adj < 0.05, and cross-reference with databases like CellMarker.")
+print("= Tip: Open this CSV in Excel, filter for p_val_adj < 0.05, and cross-reference with databases like CellMarker.")
 
 # Create a mapping vector from cluster IDs to annotated cell types
 new.cluster.ids <- c(
@@ -474,9 +433,7 @@ ggsave(
   height = 8
 )
 
-# ==============================================================================
-# STEP 11: Split Fragment Files by Cell Type
-# ==============================================================================
+## Split Fragment Files by Cell Type
 # Now we have the 'cell_type' column, so we can safely split the fragment files.
 
 output_dir <- file.path(base_dir, "fragment_files_split_by_celltype")
@@ -499,7 +456,6 @@ SplitFragments(
 )
 
 print(" Finished splitting fragment files by cell type.")
-print(" Entire annotation and splitting workflow complete!")
 
 # Recommended: save the object again to persist the cell_type metadata
 saveRDS(

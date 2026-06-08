@@ -8,9 +8,6 @@
 #   1. pycisTopic peak merging (peak_calling.py, consensus_mm10.py, build_universal_scpm.py)
 #   2. scanpy + pydeseq2 aging-DAR re-calling (09_aging_comparison/02_*)
 #
-# The original pipeline used two separate envs (scenicplus + scanpy_env);
-# they're consolidated here for convenience. If you hit a dependency conflict,
-# split back into two envs.
 
 name: scenicplus
 channels:

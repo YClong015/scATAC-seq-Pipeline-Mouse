@@ -42,7 +42,7 @@ export BEDPATH="${BEDPATH_FILE}"
 export TMPDIR="${TMPDIR}"
 
 PY="$HOME/.conda/envs/scenicplus/bin/python"
-"$PY" /home/s4869245/scripts/peak_calling_for_kidney/peak_calling_kidney.py
+"$PY" ${SLURM_SUBMIT_DIR}/peak_calling_kidney.py
 
 conda deactivate
 

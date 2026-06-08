@@ -25,11 +25,11 @@ mkdir -p $OUTPUT_DIR
 
 cd $TMPDIR
 
-# --- Data Preparation ---
+## Data Preparation
 cp ${SOURCE_DIR}/${FQ_R1} ${TMPDIR}/${SAMPLE}_R1.fastq.gz
 cp ${SOURCE_DIR}/${FQ_R2} ${TMPDIR}/${SAMPLE}_R2.fastq.gz
 
-# --- Core Analysis ---
+## Core Analysis
 echo "Starting dnbc4tools atac run for sample ${SAMPLE} at $(date)"
 $DNBC4TOOLS_EXE atac run \
         --name ${SAMPLE} \
@@ -39,7 +39,7 @@ $DNBC4TOOLS_EXE atac run \
         --threads 32 \
         --customize 'cb,R2:51-60;R1,R1:1-50;R2,R2:1-50'
 
-# --- Packaging ---
+## Packaging
 echo "Packaging results for sample ${SAMPLE} at $(date)"
 tar -zcvf $TMPDIR/${SAMPLE}.tar.gz ${TMPDIR}/${SAMPLE}
 cp ${TMPDIR}/${SAMPLE}.tar.gz ${OUTPUT_DIR}/${DATA}_${SAMPLE}.tar.gz

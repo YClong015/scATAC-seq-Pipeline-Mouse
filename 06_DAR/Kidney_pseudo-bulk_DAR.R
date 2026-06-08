@@ -1,7 +1,5 @@
-# ============================================================
 # Kidney pseudo-bulk DAR wrapper (DESeq2 via DATesting.R)
 # Based on previous workflow
-# ============================================================
 
 suppressPackageStartupMessages({
   library(Seurat)
@@ -10,9 +8,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
-# -----------------------------
-# 0) User paths (EDIT THESE)
-# -----------------------------
+## User paths (EDIT THESE)
 # Per-tissue universal-peak Seurat object (output of 05_universal_assays/kidney/).
 # This is the OLD universal-peak version (kidney_merged_universal.rds), NOT the
 # v5 figure-only object. See top-level README + 06_DAR/README.md for context.
@@ -41,9 +37,7 @@ dir.create(file.path(out_dir, "QC"),
 dir.create(file.path(out_dir, "Figures"),
            showWarnings = FALSE)
 
-# -----------------------------
-# 1) Parameters (EDIT if needed)
-# -----------------------------
+## Parameters (EDIT if needed)
 assay_name <- "peaks_universal"
 # tissue_col removed: kidney_merged_universal.rds is already a per-tissue object,
 # no `Tissue == "Kidney"` subset needed.
@@ -73,9 +67,7 @@ contrasts_list <- list(
   c("Day42", "Day14")
 )
 
-# -----------------------------
-# 2) Load helper functions
-# -----------------------------
+## Load helper functions
 if (!file.exists(datesting_r_path)) {
   stop("DATesting.R not found: ", datesting_r_path)
 }
@@ -85,9 +77,7 @@ source(datesting_r_path)
 stopifnot(exists("apply_DESeq2_test_seurat"))
 stopifnot(exists("GetExpressedPeaks"))
 
-# -----------------------------
-# 3) Load Seurat object
-# -----------------------------
+## Load Seurat object
 if (!file.exists(obj_rds_path)) {
   stop("Object RDS not found: ", obj_rds_path)
 }
@@ -111,9 +101,7 @@ if (length(missing_cols) > 0) {
 
 DefaultAssay(obj) <- assay_name
 
-# -----------------------------
-# 4) Metadata prep (no tissue subset — obj is already kidney-only)
-# -----------------------------
+## Metadata prep (no tissue subset - obj is already kidney-only)
 obj_kidney <- obj
 
 obj_kidney$dar_group <- as.character(obj_kidney[[group_col]][, 1])
@@ -158,9 +146,7 @@ message("Kidney cells: ", ncol(obj_kidney))
 message("Eligible cell types: ",
         paste(eligible_celltypes, collapse = ", "))
 
-# -----------------------------
-# 5) Helpers
-# -----------------------------
+## Helpers
 peak_to_bed <- function(peaks, out_file) {
   if (length(peaks) == 0) {
     return(invisible(NULL))
@@ -189,16 +175,11 @@ safe_hist <- function(x, title_txt, out_png) {
   dev.off()
 }
 
-# -----------------------------
-# 6) Run pseudo-bulk DAR loop
-# -----------------------------
+## Run pseudo-bulk DAR loop
 all_summary <- list()
 
 for (ct in eligible_celltypes) {
-  message("\n========================================")
   message("Processing cell type: ", ct)
-  message("========================================")
-  
   ct_obj <- subset(obj_kidney, subset = cell_type_dar == ct)
   DefaultAssay(ct_obj) <- assay_name
   
@@ -386,9 +367,7 @@ for (ct in eligible_celltypes) {
   gc()
 }
 
-# -----------------------------
-# 7) Save summary + Count plot
-# -----------------------------
+## Save summary + Count plot
 if (length(all_summary) == 0) {
   stop("No pseudo-bulk DAR results were generated.")
 }

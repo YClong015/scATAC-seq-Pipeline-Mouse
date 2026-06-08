@@ -20,7 +20,7 @@ Provides `pycisTopic 1.0.3` (peak merging), `macs2`, `scanpy`, `pydeseq2` (aging
 ## HPC modules
 
 See `hpc_modules.txt`. The pipeline assumes a SLURM cluster with these modules available:
-- `r/4.4.2`, `anaconda3/2023.09-0`, `sra-toolkit`, `bedtools/2.30.0`, `cellranger-atac/2.1.0`
+- `r/4.4.2`, `anaconda3/2023.09-0`, `sra-toolkit`, `bedtools/2.30.0`, `cellranger-atac/2.0.0`
 
 ## HOMER
 
@@ -33,7 +33,7 @@ perl configureHomer.pl -install mm10
 export HOMER_HOME=/scratch/user/${USER}/homer
 export PATH=${HOMER_HOME}/bin:${PATH}
 ```
-Most HOMER-running SLURM scripts in `07_HOMER/` set `HOMER_HOME` at the top — adjust there if your install path differs.
+Most HOMER-running SLURM scripts in `07_HOMER/` set `HOMER_HOME` at the top - adjust there if your install path differs.
 
 ## Required environment variables
 
@@ -43,7 +43,7 @@ The scripts read these for portability:
 |---|---|---|
 | `DATA_ROOT` | `/QRISdata/Q8448/Mouse_disease_data` | Root of all raw + processed data |
 | `REF_ROOT` | `/scratch/user/$USER/mm10_ref` | mm10 chrom.sizes + ENCODE blacklist |
-| `HOMER_HOME` | `/scratch/user/s4869245/homer` | HOMER install root |
+| `HOMER_HOME` | `/scratch/user/$USER/homer` | HOMER install root |
 | `CHROMSIZES_FILE` | `${REF_ROOT}/mm10.chrom.sizes` | UCSC mm10 chrom sizes |
 | `BLACKLIST` | `${REF_ROOT}/mm10-blacklist.v2.bed` | ENCODE blacklist v2 |
 

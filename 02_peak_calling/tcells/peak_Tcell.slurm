@@ -18,7 +18,7 @@ export MACS2=$(which macs2)
 
 PY="/home/s4869245/.conda/envs/scenicplus/bin/python"
 
-BED_DIR="/QRISdata/Q8448/Mouse_disease_data/Tcells/fragment_files_split_by_celltype"
+BED_DIR="/QRISdata/Q8448/Mouse_disease_data/Tcells/fragment_files_split_by_celltype_final"
 LIST="${BED_DIR}/DataList.txt"
 
 DATA="$(sed -n "${SLURM_ARRAY_TASK_ID}p" "${LIST}")"
@@ -41,4 +41,4 @@ export OUTDIR="${FINAL_OUT_DIR}"
 export BEDPATH="${BEDPATH_FILE}"
 export TMPDIR="${TMPDIR}"
 
-"${PY}" /home/s4869245/scripts/scATAC-seq/Tcell/peak_calling_Tcell.py
+"${PY}" ${SLURM_SUBMIT_DIR}/peak_calling_Tcell.py

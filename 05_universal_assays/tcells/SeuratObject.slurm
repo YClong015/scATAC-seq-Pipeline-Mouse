@@ -46,9 +46,7 @@ Rscript "${SCRIPT}" \
 # Validate the output
 Rscript -e '
 x <- readRDS("'"${OUT}"'");
-cat("----------------------------------\n");
 cat("Success! Tcells universal assay added.\n");
 cat("Features: ", nrow(x[["peaks_universal"]]), "\n");
 cat("Assay Key used: deMultliplex2_final_mapped\n");
-cat("----------------------------------\n");
 '

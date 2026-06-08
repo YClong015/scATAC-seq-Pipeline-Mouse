@@ -1,6 +1,6 @@
-# Stage 05 — Re-quantify per-tissue Seurat objects on the universal peak set
+# Stage 05 - Re-quantify per-tissue Seurat objects on the universal peak set
 
-Each tissue's annotated Seurat object (from stage 01) is re-quantified against the universal peak set (stage 04 output) using `FeatureMatrix()`. The output is a per-tissue Seurat object with a new `peaks_universal` assay — this is the canonical input to stage 07 (DAR).
+Each tissue's annotated Seurat object (from stage 01) is re-quantified against the universal peak set (stage 04 output) using `FeatureMatrix()`. The output is a per-tissue Seurat object with a new `peaks_universal` assay - this is the canonical input to stage 07 (DAR).
 
 ## Why?
 
@@ -16,16 +16,16 @@ sbatch 05_universal_assays/tcells/SeuratObject.slurm
 
 # Lung is two-step (the second step is needed because Lung emerged with +14 features
 # over the Kidney/Aorta/Tcells feature count after re-quantification):
-sbatch 05_universal_assays/lung/SeuratObject.slurm           # → lung_universal.rds
-Rscript 05_universal_assays/lung/Diagnose_lung.R             # → lung_universal_new_pruned.rds
+sbatch 05_universal_assays/lung/SeuratObject.slurm           # -> lung_universal.rds
+Rscript 05_universal_assays/lung/prune_lung_features.R             # -> lung_universal_new_pruned.rds
 ```
 
 Each SLURM script invokes its tissue's `SeuratObject.R` with arguments:
-- `--obj` — input Seurat .rds (from stage 01)
-- `--up` — universal peak BED.gz (stage 04 output)
-- `--out` — output .rds
-- `--frag_tpl` — fragment-file path template, with `{id}` placeholder filled per-sample
-- `--sample_key` — metadata column that maps cells to fragment files
+- `--obj` - input Seurat .rds (from stage 01)
+- `--up` - universal peak BED.gz (stage 04 output)
+- `--out` - output .rds
+- `--frag_tpl` - fragment-file path template, with `{id}` placeholder filled per-sample
+- `--sample_key` - metadata column that maps cells to fragment files
 
 ## Tissue-specific barcode reconciliation
 
@@ -43,14 +43,14 @@ Each tissue's `SeuratObject.R` contains a tissue-specific `clean_barcodes()` / `
 | Tissue | Output | Notes |
 |---|---|---|
 | Kidney | `${DATA_ROOT}/Kidney/kidney_merged_universal.rds` | Read by `06_DAR/Kidney_pseudo-bulk_DAR.R` |
-| Lung | `${DATA_ROOT}/Lung/lung_universal_new_pruned.rds` | Pruned to match Kidney's 667,459 feature count via `Diagnose_lung.R`. Read by `06_DAR/Lung_specific_DAR_pseudo-bulk.R` |
+| Lung | `${DATA_ROOT}/Lung/lung_universal_new_pruned.rds` | Pruned to match Kidney's 667,459 feature count via `prune_lung_features.R`. Read by `06_DAR/Lung_pseudo-bulk_DAR.R` |
 | Aorta | `${DATA_ROOT}/Aorta/Aorta_integrated_universal.rds` | Read by `06_DAR/Aorta_pseudo-bulk_DAR.R` |
 | T cells | `${DATA_ROOT}/Tcells/tcells_universal.rds` | Read by `06_DAR/Tcells_pseudo-bulk_DAR.R` |
 
 All four objects share the same `peaks_universal` assay with the same peak coordinates (after Lung pruning), enabling cross-tissue comparison.
 
-## Why Lung needs `Diagnose_lung.R` (the extra pruning step)
+## Why Lung needs `prune_lung_features.R` (the extra pruning step)
 
-When `SeuratObject.R` re-quantifies Lung against the universal peak set, it occasionally produces +14 extra peak features beyond the Kidney/Aorta/Tcells count (667,473 vs 667,459). The reason is an artefact of the chromosome-set difference between the tissues' source fragment files. `Diagnose_lung.R` prunes Lung's feature space to exactly match Kidney's reference so that all four objects can be merged or compared peak-by-peak in downstream stages.
+When `SeuratObject.R` re-quantifies Lung against the universal peak set, it occasionally produces +14 extra peak features beyond the Kidney/Aorta/Tcells count (667,473 vs 667,459). The reason is an artefact of the chromosome-set difference between the tissues' source fragment files. `prune_lung_features.R` prunes Lung's feature space to exactly match Kidney's reference so that all four objects can be merged or compared peak-by-peak in downstream stages.
 
-The output `lung_universal_new_pruned.rds` is what `06_DAR/Lung_specific_DAR_pseudo-bulk.R` reads.
+The output `lung_universal_new_pruned.rds` is what `06_DAR/Lung_pseudo-bulk_DAR.R` reads.

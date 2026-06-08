@@ -1,20 +1,6 @@
 #!/usr/bin/env Rscript
-# ==============================================================================
-# Tcell_clean_recluster.R
-# Stage 1 of T-cell re-annotation:
-#   - Remove contaminating non-T clusters confirmed by FindAllMarkers
-#     (B cells: Tfh_like_T, CD8_Eff;  plasma: NK;  myeloid: Cytotoxic_CD8_T, Memory_CD8_T)
-#   - Optional marker-score safety gate to catch residual stragglers
-#   - Re-run the SAME LSI/Harmony/UMAP/clustering pipeline as Tcell_scATAC.R
-#   - Output FindAllMarkers + canonical-marker DotPlot for re-annotation
-#
-# After running, INSPECT the outputs:
-#   Tcells_clean_cluster_topmarkers.csv   -> top genes per new cluster
-#   Tcells_clean_recheck_dotplot.pdf      -> confirm no residual B/plasma/myeloid
-#   Tcells_clean_UMAP_clusters.pdf        -> new UMAP
-# If any NEW cluster still shows Pax5/Cd79a/Sdc1/Jchain/Adgre1 -> add to
-# `extra_drop_clusters` below and re-run (iterative cleanup).
-# ==============================================================================
+# Remove contaminating clusters from tcells_processed.rds, re-embed, and re-cluster
+# the clean T cells. Output feeds Tcell_final_annotate.R.
 
 suppressPackageStartupMessages({
   library(Signac); library(Seurat); library(harmony)
@@ -28,9 +14,6 @@ OUT_RDS  <- file.path(BASE_DIR, "tcells_clean_reclustered.rds")
 
 # Contaminating clusters confirmed by FindAllMarkers (by current cell_type label)
 CONTAM_TYPES <- c("Tfh_like_T", "CD8_Eff", "NK", "Cytotoxic_CD8_T", "Memory_CD8_T")
-# If a NEW cluster after re-clustering is still contamination, add its
-# seurat_clusters id here and re-run (leave empty on first pass).
-# Pass 2: 9 = high-mito low-quality, 10 = residual B cells, 12 = endothelial/stromal.
 extra_drop_clusters <- c("9", "10", "12")
 
 # Marker-score safety gate (remove individual straggler non-T cells)
@@ -41,11 +24,11 @@ tcells <- readRDS(IN_RDS)
 message("Loaded: ", ncol(tcells), " cells")
 cat("\nOriginal cell_type counts:\n"); print(table(tcells$cell_type))
 
-# ---- 1) Remove labelled contaminating clusters ------------------------------
+## remove labelled contaminating clusters
 tcells <- subset(tcells, subset = cell_type %in% CONTAM_TYPES, invert = TRUE)
 message("\nAfter removing labelled contamination: ", ncol(tcells), " cells")
 
-# ---- 2) Optional safety gate by contamination marker score ------------------
+## optional safety gate by contamination marker score
 if (USE_SAFETY_GATE) {
   DefaultAssay(tcells) <- "SCT"
   contam_markers <- list(
@@ -68,9 +51,8 @@ if (USE_SAFETY_GATE) {
   message("After safety gate: ", ncol(tcells), " cells")
 }
 
-# ---- 3) Re-run LSI / Harmony / UMAP / clustering (same params as original) ---
+## re-run LSI + Harmony + UMAP + clustering (same params as original)
 DefaultAssay(tcells) <- "ATAC"
-message("\nRe-running LSI + Harmony + UMAP + clustering on clean T cells...")
 tcells <- RunTFIDF(tcells)
 tcells <- FindTopFeatures(tcells, min.cutoff = "q0")
 tcells <- RunSVD(tcells)
@@ -88,8 +70,7 @@ tcells <- FindNeighbors(tcells, reduction = "harmony", dims = 2:30)
 tcells <- FindClusters(tcells, algorithm = 3, resolution = 0.6,
                        verbose = FALSE, random.seed = 1234)
 
-# Second-pass: drop residual contaminated/low-quality clusters, then RE-EMBED
-# (so the final UMAP/clusters are computed without them).
+# Second-pass: drop residual contaminated/low-quality clusters
 if (length(extra_drop_clusters) > 0) {
   tcells <- subset(tcells, subset = seurat_clusters %in% extra_drop_clusters, invert = TRUE)
   message("Dropped extra clusters [", paste(extra_drop_clusters, collapse=","), "]; ",
@@ -108,12 +89,12 @@ if (length(extra_drop_clusters) > 0) {
                          verbose = FALSE, random.seed = 1234)
 }
 
-# ---- 4) UMAP preview --------------------------------------------------------
+## UMAP preview
 p1 <- DimPlot(tcells, reduction = "umap", label = TRUE, pt.size = 0.3) +
       ggtitle(paste0("Re-clustered clean T cells (n=", ncol(tcells), ")"))
 ggsave(file.path(BASE_DIR, "Tcells_clean_UMAP_clusters.pdf"), p1, width = 8, height = 6)
 
-# ---- 5) FindAllMarkers + canonical-marker DotPlot for re-annotation ---------
+## FindAllMarkers + canonical-marker DotPlot for re-annotation
 DefaultAssay(tcells) <- "SCT"
 Idents(tcells) <- "seurat_clusters"
 fam <- FindAllMarkers(tcells, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.25)

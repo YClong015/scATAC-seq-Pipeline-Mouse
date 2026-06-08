@@ -1,4 +1,4 @@
-# Lung COPD raw data download — CNGBdb CNP0004399
+# Lung COPD raw data download - CNGBdb CNP0004399
 
 Source paper: **Zhang Q. et al., 2025 PLOS ONE** (`paper/Lung_mice_paper.pdf`)
 Project: https://db.cngb.org/search/project/CNP0004399/
@@ -16,20 +16,20 @@ Project: https://db.cngb.org/search/project/CNP0004399/
 
 ## Two download scripts
 
-### `download_full_directory.sh` (recursive — recommended)
+### `download_full_directory.slurm` (recursive - recommended)
 
 Recursive `wget` of a whole CNGB sample directory (gets R1 + R2 + metadata in one shot). Edit `FTP_DIR_URL` for each sample.
 
 ```bash
-sbatch 00_download/lung_cngb/download_full_directory.sh
+sbatch 00_download/lung_cngb/download_full_directory.slurm
 ```
 
-### `download_per_sample.sh` (single URL, fallback)
+### `download_per_sample.slurm` (single URL, fallback)
 
 Targeted single-file `wget` if recursive download fails (e.g. CNGB rate-limiting). Edit the `URLS` array.
 
 ```bash
-sbatch 00_download/lung_cngb/download_per_sample.sh
+sbatch 00_download/lung_cngb/download_per_sample.slurm
 ```
 
 ## Output directory structure
@@ -43,11 +43,11 @@ ${DATA_ROOT}/Lung/Lung_raw_data/CNX0739{875..880}/CNR0841{131..136}/
 
 ## Next step: dnbc4tools alignment
 
-This is **MGI** sequencing, NOT 10x — so no Cell Ranger. Use `dnbc4tools atac run` per sample:
+This is **MGI** sequencing, NOT 10x - so no Cell Ranger. Use `dnbc4tools atac run` per sample:
 
 ```bash
 # Build mm10 reference first (one-time)
-sbatch 00_download/mkref_MGI.sh
+sbatch 00_download/mkref_MGI.slurm
 
 # Per-sample alignment (6 jobs, run in parallel)
 for i in 75 76 77 78 79 80; do
@@ -55,6 +55,6 @@ for i in 75 76 77 78 79 80; do
 done
 ```
 
-Outputs land at `${DATA_ROOT}/Lung/Lung_cellatac/{CL_id}/outs/` — equivalent to Cell Ranger's `outs/` directory (fragments.tsv.gz, peaks.bed, filter_peak_matrix/, singlecell.csv).
+Outputs land at `${DATA_ROOT}/Lung/Lung_cellatac/{CL_id}/outs/` - equivalent to Cell Ranger's `outs/` directory (fragments.tsv.gz, peaks.bed, filter_peak_matrix/, singlecell.csv).
 
-Then proceed to `01_preprocessing/lung/atac_Lung.Rmd` to build the merged Seurat object.
+Then proceed to `01_preprocessing/lung/atac_Lung.R` to build the merged Seurat object.

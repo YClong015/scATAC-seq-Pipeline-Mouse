@@ -1,7 +1,4 @@
-# ==============================================================================
-# Aortic scATAC-seq Integration Workflow (Reproducible with Seed)
-# ==============================================================================
-
+## Aortic scATAC-seq Integration Workflow (Reproducible with Seed)
 library(Signac)
 library(Seurat)
 library(EnsDb.Mmusculus.v79)
@@ -13,10 +10,8 @@ library(GenomeInfoDb)
 library(GenomicRanges)
 library(BiocParallel)
 
-# ----------------------------
-# Reproducibility (GLOBAL SEED)
-# ----------------------------
-SEED <- 20260218L
+## Reproducibility (GLOBAL SEED)
+SEED <- 1234L
 set.seed(SEED)
 
 # scDblFinder reproducibility:
@@ -24,16 +19,12 @@ set.seed(SEED)
 # - This forces deterministic RNG inside scDblFinder when BiocParallel is used.
 bp <- SerialParam(RNGseed = SEED)
 
-# ----------------------------
-# 0) Annotation (mm10)
-# ----------------------------
+## Annotation (mm10)
 annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
 seqlevelsStyle(annotations) <- "UCSC"
 genome(annotations) <- "mm10"
 
-# ----------------------------
-# 1) Sample Info
-# ----------------------------
+## Sample Info
 base_dir <- "/QRISdata/Q8448/Mouse_disease_data/Aorta/Aorta_cellranger_atac"
 
 samples <- data.frame(
@@ -45,9 +36,7 @@ samples <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# ----------------------------
-# 1.5) Build Unified Peak Set
-# ----------------------------
+## Build Unified Peak Set
 print("Building Unified Peak Set...")
 peaks_list <- list()
 
@@ -66,9 +55,7 @@ combined.peaks <- combined.peaks[peakwidths < 10000 & peakwidths > 20]
 
 print(paste0("Unified Peak Set constructed: ", length(combined.peaks), " peaks."))
 
-# ----------------------------
-# 2) Loop: Re-quantify -> QC -> Per-sample LSI
-# ----------------------------
+## Loop: Re-quantify -> QC -> Per-sample LSI
 obj_list <- list()
 
 for (i in 1:nrow(samples)) {
@@ -117,7 +104,6 @@ for (i in 1:nrow(samples)) {
   
   Annotation(cur_obj) <- annotations
   
-  print("  - Calculating QC metrics...")
   cur_obj <- NucleosomeSignal(cur_obj)
   cur_obj <- TSSEnrichment(cur_obj, fast = FALSE)
   
@@ -135,10 +121,7 @@ for (i in 1:nrow(samples)) {
   cur_obj$blacklist_ratio <- cur_obj$blacklist_region_fragments /
     cur_obj$peak_region_fragments
   
-  # ----------------------------
-  # Doublet Removal (Reproducible)
-  # ----------------------------
-  print("  - Running scDblFinder (reproducible)...")
+  ## Doublet Removal (Reproducible)
   counts_mat <- GetAssayData(
     cur_obj,
     assay = "peaks",
@@ -163,9 +146,7 @@ for (i in 1:nrow(samples)) {
       TSS.enrichment > 2
   )
   
-  # ----------------------------
-  # Per-sample LSI (Reproducible)
-  # ----------------------------
+  ## Per-sample LSI (Reproducible)
   # RunSVD uses irlba internally; set.seed helps keep it stable across runs.
   set.seed(SEED)
   cur_obj <- RunTFIDF(cur_obj)
@@ -175,10 +156,7 @@ for (i in 1:nrow(samples)) {
   obj_list[[sample_name]] <- cur_obj
 }
 
-# ----------------------------
-# 3) Integration Anchors (rLSI)
-# ----------------------------
-print("Finding Integration Anchors (Method: rLSI)...")
+## Integration Anchors (rLSI)
 common_features <- rownames(obj_list[[1]])
 print(paste0("Common features for integration: ", length(common_features)))
 
@@ -211,10 +189,7 @@ aortic <- IntegrateEmbeddings(
   dims.to.integrate = 1:30
 )
 
-# ----------------------------
-# 4) UMAP + Clustering (Reproducible)
-# ----------------------------
-print("Running UMAP and Clustering on Integrated Data...")
+## UMAP + Clustering (Reproducible)
 
 aortic <- RunUMAP(
   aortic,
@@ -236,10 +211,7 @@ aortic <- FindClusters(
   verbose = FALSE
 )
 
-# ----------------------------
-# 5) Gene Activities
-# ----------------------------
-print("Calculating Gene Activities...")
+## Gene Activities
 DefaultAssay(aortic) <- "peaks"
 
 gene.activities <- GeneActivity(
@@ -301,9 +273,7 @@ top5 <- mk %>%
 cluster_list <- split(top5, top5$cluster)
 print(lapply(cluster_list, function(x) x[, c("gene", "avg_log2FC")]))
 
-# ----------------------------
-# 6) Manual Annotation
-# ----------------------------
+## Manual Annotation
 print("Annotating Clusters...")
 
 new_cluster_ids <- c(
@@ -324,9 +294,7 @@ new_cluster_ids <- c(
 aortic <- RenameIdents(aortic, new_cluster_ids)
 aortic$cell_type <- Idents(aortic)
 
-# ----------------------------
-# 6.5) Save annotated object (AFTER MARKING)
-# ----------------------------
+## Save annotated object (AFTER MARKING)
 aortic@misc$pipeline_params <- list(
   seed = SEED,
   resolution = 0.6,
@@ -353,9 +321,7 @@ saveRDS(
 
 print(paste0("Saved object to: ", file.path(save_dir, obj_tag)))
 
-# ----------------------------
-# 7) Plots
-# ----------------------------
+## Plots
 p1 <- DimPlot(
   aortic,
   reduction = "umap",
@@ -375,9 +341,7 @@ p2 <- DimPlot(
 print(p1)
 print(p2)
 
-# ----------------------------
-# 8) Split fragment files by cell type
-# ----------------------------
+## Split fragment files by cell type
 output_dir <- paste0(
   "/QRISdata/Q8448/Mouse_disease_data/Aorta/",
   "fragment_files"

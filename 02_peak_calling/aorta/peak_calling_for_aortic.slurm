@@ -41,7 +41,7 @@ export BEDPATH="${BEDPATH_FILE}"
 export TMPDIR="${TMPDIR}"
 
 PY="$HOME/.conda/envs/scenicplus/bin/python"
-"$PY" /home/s4869245/scripts/Aortic/peak_calling_for_aorta/peak_calling.py
+"$PY" ${SLURM_SUBMIT_DIR}/peak_calling.py
 
 conda deactivate
 

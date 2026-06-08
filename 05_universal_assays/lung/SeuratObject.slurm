@@ -10,13 +10,11 @@
 #SBATCH -o %x_%j.out
 #SBATCH -e %x_%j.err
 
-# ============================================================
-# Stage 05 — Lung (step 1 of 2):
+# Stage 05 - Lung (step 1 of 2):
 # Re-quantify the cleaned + annotated Lung Seurat object
 # against the OLD universal peak set.
 # Output -> lung_universal.rds (will be pruned to
-# lung_universal_new_pruned.rds by Diagnose_lung.R in step 2).
-# ============================================================
+# lung_universal_new_pruned.rds by prune_lung_features.R in step 2).
 
 set -euo pipefail
 module load r/4.4.2
@@ -25,10 +23,10 @@ module load r/4.4.2
 UP="/QRISdata/Q8448/Mouse_disease_data/Universal_peaks/Kidney_Aorta_Tcells_Lung/consensus_peak_calling/consensus_regions.bed.gz"
 
 # Input: cleaned + annotated Lung Seurat object built by
-# 01_preprocessing/lung/atac_Lung.Rmd.
+# 01_preprocessing/lung/atac_Lung.R.
 OBJ="/QRISdata/Q8448/Mouse_disease_data/Lung/lung_integrated_clean_annotated.rds"
 
-# Output BEFORE pruning. Diagnose_lung.R in this same dir then prunes
+# Output BEFORE pruning. prune_lung_features.R in this same dir then prunes
 # the resulting object to match Kidney's feature count (667,459 peaks)
 # and writes lung_universal_new_pruned.rds (which is the canonical DAR input).
 OUT="/QRISdata/Q8448/Mouse_disease_data/Lung/lung_universal.rds"
@@ -53,4 +51,4 @@ Rscript SeuratObject.R \
   --frag_tpl "${FRAG_TPL}"
 
 echo "Step 1 done. Output: ${OUT}"
-echo "Next: Rscript Diagnose_lung.R   # prunes to lung_universal_new_pruned.rds"
+echo "Next: Rscript prune_lung_features.R   # prunes to lung_universal_new_pruned.rds"

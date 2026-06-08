@@ -66,10 +66,7 @@ if (obj_path == "" || up_bed == "" || out_rds == "") {
   stop("Need --obj --up --out")
 }
 
-msg("===============================================")
 msg("Step 1: Load object")
-msg("===============================================")
-
 if (obj_type == "rds") {
   obj <- readRDS(obj_path)
 } else if (obj_type == "rdata") {
@@ -96,17 +93,11 @@ DefaultAssay(obj) <- assay_in
 msg(paste0("OK loaded: ", obj_path))
 msg(paste0("Cells: ", ncol(obj)))
 
-msg("===============================================")
 msg("Step 2: Load universal peaks (bed.gz)")
-msg("===============================================")
-
 peaks <- load_peaks_bed_gz(up_bed)
 msg(paste0("Peaks: ", length(peaks)))
 
-msg("===============================================")
 msg("Step 3: Build FeatureMatrix on universal peaks")
-msg("===============================================")
-
 counts_list <- list()
 
 if (mode == "single") {
@@ -188,10 +179,7 @@ if (length(common) == 0) stop("No overlap between obj cells and counts.")
 obj <- subset(obj, cells = common)
 counts <- counts[, common, drop = FALSE]
 
-msg("===============================================")
 msg("Step 4: Add new assay and save")
-msg("===============================================")
-
 msg(paste0("Copying annotations from assay: ", assay_in))
 old_annotations <- Annotation(obj[[assay_in]])
 
