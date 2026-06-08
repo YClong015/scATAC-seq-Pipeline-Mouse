@@ -63,13 +63,12 @@ sample_key  <- get_arg(args, "--sample_key", "dataset")
 frag_tpl    <- get_arg(args, "--frag_tpl", "")
 
 if (obj_path == "" || up_bed == "" || out_rds == "") {
-  stop("Error: Missing required arguments: --obj, --up, or --out")
+  stop("Missing required arguments: --obj, --up, or --out")
 }
 
-msg("=== Step 1: Load Seurat Object ===")
 obj <- readRDS(obj_path)
 if (!assay_in %in% names(obj@assays)) {
-  stop(paste0("Error: Assay not found in object: ", assay_in))
+  stop(paste0("Assay not found in object: ", assay_in))
 }
 DefaultAssay(obj) <- assay_in
 msg(paste0("Loaded object: ", obj_path))
@@ -77,18 +76,16 @@ msg(paste0("Total cells: ", ncol(obj)))
 msg(paste0("Using sample key column: ", sample_key))
 
 if (!sample_key %in% colnames(obj@meta.data)) {
-  stop(paste0("Error: The sample_key '", sample_key, "' was not found!"))
+  stop(paste0("The sample_key '", sample_key, "' not found"))
 }
 
-msg("=== Step 2: Load Universal Peaks (BED) ===")
 peaks <- load_peaks_bed_gz(up_bed)
 msg(paste0("Loaded universal peaks: ", length(peaks)))
 
-msg("=== Step 3: Build FeatureMatrix ===")
 counts_list <- list()
 
 if (mode == "per_sample") {
-  if (frag_tpl == "") stop("Error: --mode per_sample requires --frag_tpl")
+  if (frag_tpl == "") stop("--mode per_sample requires --frag_tpl")
 
   sample_ids <- sort(unique(obj[[sample_key]][, 1]))
   msg(paste0("Found ", length(sample_ids), " samples to process."))
@@ -125,20 +122,19 @@ if (mode == "per_sample") {
     counts_list[[id]] <- mat
   }
 
-  if (length(counts_list) == 0) stop("FATAL: No matrices generated.")
+  if (length(counts_list) == 0) stop("No matrices generated.")
   counts <- do.call(cbind, counts_list)
 
 } else {
-  stop("Error: This script is configured for --mode per_sample only.")
+  stop("This script is configured for --mode per_sample only.")
 }
 
 common <- intersect(colnames(obj), colnames(counts))
 msg(paste0("Total matched cells: ", length(common), " / ", ncol(obj)))
-if (length(common) == 0) stop("FATAL: No overlap.")
+if (length(common) == 0) stop("No overlap.")
 
 counts <- counts[, colnames(obj), drop = FALSE]
 
-msg("=== Step 4: Create Assay and Save ===")
 assay_u <- CreateChromatinAssay(counts = counts, genome = "mm10")
 obj[[assay_out]] <- assay_u
 DefaultAssay(obj) <- assay_out
@@ -146,4 +142,4 @@ DefaultAssay(obj) <- assay_out
 msg(paste0("New assay dimensions: ", nrow(obj[[assay_out]]), " x ", ncol(obj[[assay_out]])))
 
 saveRDS(obj, out_rds)
-msg(paste0("Success! Object saved to: ", out_rds))
+msg(paste0("Saved: ", out_rds))

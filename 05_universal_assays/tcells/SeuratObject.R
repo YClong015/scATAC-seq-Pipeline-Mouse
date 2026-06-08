@@ -77,19 +77,19 @@ frag_tpl    <- get_arg(args, "--frag_tpl", "")
 
 # Validate required arguments
 if (obj_path == "" || up_bed == "" || out_rds == "") {
-  stop("Error: Missing required arguments: --obj, --up, or --out")
+  stop("Missing required arguments: --obj, --up, or --out")
 }
 
 msg("Step 1: Load Seurat Object")
 if (obj_type == "rds") {
   obj <- readRDS(obj_path)
 } else {
-  stop("Error: --objtype must be 'rds'")
+  stop("--objtype must be 'rds'")
 }
 
 # Check if input assay exists
 if (!assay_in %in% names(obj@assays)) {
-  stop(paste0("Error: Assay not found in object: ", assay_in))
+  stop(paste0("Assay not found in object: ", assay_in))
 }
 DefaultAssay(obj) <- assay_in
 
@@ -99,7 +99,7 @@ msg(paste0("Using sample key column: ", sample_key))
 
 # Validate sample_key in metadata
 if (!sample_key %in% colnames(obj@meta.data)) {
-    stop(paste0("Error: The sample_key '", sample_key, "' was not found in the object metadata!"))
+    stop(paste0("The sample_key '", sample_key, "' was not found in the object metadata!"))
 }
 
 msg("Step 2: Load Universal Peaks (BED)")
@@ -110,7 +110,7 @@ msg("Step 3: Build FeatureMatrix (Quantification)")
 counts_list <- list()
 
 if (mode == "per_sample") {
-  if (frag_tpl == "") stop("Error: --mode per_sample requires --frag_tpl")
+  if (frag_tpl == "") stop("--mode per_sample requires --frag_tpl")
   
   sample_ids <- sort(unique(obj[[sample_key]][, 1]))
   msg(paste0("Found ", length(sample_ids), " samples to process."))
@@ -159,20 +159,20 @@ if (mode == "per_sample") {
     counts_list[[id]] <- mat
   }
 
-  if (length(counts_list) == 0) stop("FATAL: No matrices generated. Check your paths and IDs!")
+  if (length(counts_list) == 0) stop("No matrices generated. Check your paths and IDs!")
   
   # Combine matrices from all samples
   counts <- do.call(cbind, counts_list)
   
 } else {
-  stop("Error: This script is configured for --mode per_sample only.")
+  stop("This script is configured for --mode per_sample only.")
 }
 
 # Final check for cell overlap
 common <- intersect(colnames(obj), colnames(counts))
 msg(paste0("Total matched cells: ", length(common), " / ", ncol(obj)))
 
-if (length(common) == 0) stop("FATAL: No overlap between object cells and calculated counts.")
+if (length(common) == 0) stop("No overlap between object cells and calculated counts.")
 
 # Subset object to matched cells (usually keeps all cells)
 obj <- subset(obj, cells = common)
@@ -196,5 +196,5 @@ DefaultAssay(obj) <- assay_out
 msg(paste0("New assay dimensions: ", paste(dim(obj[[assay_out]]), collapse=" x ")))
 
 saveRDS(obj, out_rds)
-msg(paste0("Success! Object saved to: ", out_rds))
+msg(paste0("Saved: ", out_rds))
 msg("Done.")
