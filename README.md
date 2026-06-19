@@ -20,7 +20,7 @@ Disease chromatin remodelling is consistent with the SIPHON model (Patrick et al
 
 ## Pipeline overview
 
-![Pipeline overview](docs/pipeline.png)
+![Pipeline overview](09_figures/Screenshot.png)
 
 ---
 
