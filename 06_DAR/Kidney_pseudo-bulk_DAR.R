@@ -9,7 +9,7 @@ suppressPackageStartupMessages({
 })
 
 ## User paths (EDIT THESE)
-# Per-tissue universal-peak object (OLD kidney_merged_universal.rds, not the v5 figure obj).
+# Per-tissue universal-peak object.
 obj_rds_path <- paste0(
   "/QRISdata/Q8448/Mouse_disease_data/Kidney/",
   "kidney_merged_universal.rds"
